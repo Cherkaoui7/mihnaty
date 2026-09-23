@@ -1,0 +1,21 @@
+{
+  "name": "mihnaty",
+  "version": "1.0.0",
+  "description": "Mihnati - POC & MVP Frontend - Plateforme d'orientation professionnelle basée sur les compétences",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests configured\" && exit 0"
+  },
+  "keywords": [
+    "career",
+    "orientation",
+    "skills",
+    "AI",
+    "matching"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  }
+}
