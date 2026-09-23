@@ -4,11 +4,11 @@ const GeminiAdapter = {
 
   async testConnection(config) {
     try {
-      // Un simple test : retourner du JSON
       const res = await this.generate(
         config,
-        'Return only valid JSON: {"status": "OK"}',
+        'Return only OK',
         false,
+        true
       );
       if (res && res.result) return true;
       return false;
@@ -17,13 +17,18 @@ const GeminiAdapter = {
     }
   },
 
-  async generate(config, prompt, useSearch = false) {
+  async generate(config, prompt, useSearch = false, isTest = false) {
     if (!config || !config.apiKey) {
       throw new Error("Clé API manquante ou invalide.");
     }
 
-    let model = config.model || "gemini-2.5-flash";
-    let endpoint = config.endpoint || `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    const providerDef = ProviderRegistry.get(config.provider || "gemini");
+    let model = config.model || (providerDef ? providerDef.defaultModel : "gemini-1.5-flash");
+    let endpoint = config.endpoint || (providerDef ? providerDef.defaultEndpoint : `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`);
+    
+    if (endpoint.includes("{model}")) {
+      endpoint = endpoint.replace("{model}", model);
+    }
 
     const isOpenAICompatible = endpoint.includes("/openai/") || endpoint.includes("chat/completions");
 
@@ -35,14 +40,14 @@ const GeminiAdapter = {
       body = {
         model: model,
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.2,
-        response_format: { type: "json_object" }
+        temperature: 0.2
       };
-      // For OpenAI-compatible search with Gemini (not fully standardized, but we omit tools for now or pass as OpenAI tools if needed)
+      if (!isTest) {
+        body.response_format = { type: "json_object" };
+      }
     } else {
       headers["x-goog-api-key"] = config.apiKey;
       
-      // Ensure we don't accidentally append ?key= if it's already using header
       if (endpoint.includes("key=")) {
           const urlObj = new URL(endpoint);
           urlObj.searchParams.delete('key');
@@ -50,35 +55,66 @@ const GeminiAdapter = {
       }
 
       body = {
-        model: `models/${model}`,
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
+      
+      if (!isTest) {
+        body.generationConfig = {
           temperature: 0.2,
           response_mime_type: "application/json",
-        },
-      };
+        };
+      }
 
-      if (useSearch) {
+      if (useSearch && !isTest) {
         body.tools = [{ googleSearch: {} }];
       }
     }
+    
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+       console.log("[Dev] Provider:", config.provider || "gemini");
+       console.log("[Dev] Adapter: GeminiAdapter");
+       console.log("[Dev] Final Request URL:", endpoint);
+       console.log("[Dev] Model:", model);
+    }
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await apiFetch(endpoint, {
         method: "POST",
         headers: headers,
         body: JSON.stringify(body),
       });
 
       if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Erreur Gemini (${response.status}) : ${errText}`);
+        let errText = "";
+        try { errText = await response.text(); } catch(e) {}
+        
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+           console.log("[Dev] HTTP Status:", response.status);
+           console.log("[Dev] Error:", errText);
+        }
+        
+        const err = new Error(`Erreur Gemini (${response.status}) : ${errText}`);
+        err.name = "ProviderConnectionError";
+        err.provider = "gemini";
+        err.httpStatus = response.status;
+        err.reason = errText;
+        throw err;
       }
 
+      if (isTest) {
+        return { result: "OK", grounding: null };
+      }
       const data = await response.json();
       return isOpenAICompatible ? this.parseOpenAIResponse(data) : this.parseResponse(data);
     } catch (e) {
-      throw new Error("Erreur de connexion Gemini : " + e.message);
+      if (e.name === "ProviderConnectionError") throw e;
+      
+      const err = new Error("Erreur réseau ou connexion Gemini : " + e.message);
+      err.name = "ProviderConnectionError";
+      err.provider = "gemini";
+      err.httpStatus = 0;
+      err.reason = e.message;
+      throw err;
     }
   },
 

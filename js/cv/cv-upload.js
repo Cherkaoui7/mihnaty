@@ -161,28 +161,25 @@ const CVUpload = {
     const profile = analysisResult.profile || {};
 
     const safeText = (val) =>
-      val && val !== "Non détecté" && val !== "Non dǸtectǸ"
+      val !== null && val !== undefined && val !== "" && val !== "Non détecté" && val !== "Non dǸtectǸ"
         ? val
-        : '<span style="font-style:italic;">Non détecté</span>';
+        : "Non détecté";
+        
     const isSet = (val) =>
-      val && val !== "Non détecté" && val !== "Non dǸtectǸ";
-
-    let fullName = [];
-    if (isSet(profile.firstName)) fullName.push(profile.firstName);
-    if (isSet(profile.lastName)) fullName.push(profile.lastName);
-    const nameDisplay = fullName.length > 0 ? fullName.join(" ") : null;
+      val !== null && val !== undefined && val !== "" && val !== "Non détecté" && val !== "Non dǸtectǸ";
 
     const newData = {
-      name: nameDisplay || "",
-      city: isSet(profile.city) ? profile.city : "",
-      education: isSet(profile.educationLevel) ? profile.educationLevel : "",
-      domain: isSet(profile.primaryDomain)
-        ? profile.primaryDomain
-        : isSet(profile.domain)
-          ? profile.domain
-          : "",
-      target: isSet(profile.targetRole) ? profile.targetRole : "",
-      experience: isSet(profile.experienceYears) ? profile.experienceYears : "",
+      firstName: isSet(profile.firstName) ? profile.firstName : null,
+      lastName: isSet(profile.lastName) ? profile.lastName : null,
+      fullName: isSet(profile.fullName) ? profile.fullName : null,
+      city: isSet(profile.city) ? profile.city : null,
+      country: isSet(profile.country) ? profile.country : null,
+      educationLevel: isSet(profile.educationLevel) ? profile.educationLevel : null,
+      primaryDomain: isSet(profile.primaryDomain) ? profile.primaryDomain : null,
+      secondaryDomains: Array.isArray(profile.secondaryDomains) ? profile.secondaryDomains : [],
+      targetRole: isSet(profile.targetRole) ? profile.targetRole : null,
+      experienceYears: isSet(profile.experienceYears) ? profile.experienceYears : null,
+      experienceLevel: isSet(profile.experienceLevel) ? profile.experienceLevel : null
     };
 
     const existingData = State.profile || {};
@@ -221,14 +218,14 @@ const CVUpload = {
     if (grid) {
       grid.innerHTML = `
                 <div>
-                    ${generateFieldHtml("name", "Nom Complet", newData.name, existingData.name)}
+                    ${generateFieldHtml("fullName", "Prénom & Nom", newData.fullName, existingData.fullName)}
                     ${generateFieldHtml("city", "Ville", newData.city, existingData.city)}
-                    ${generateFieldHtml("edu", "Niveau", newData.education, existingData.education)}
+                    ${generateFieldHtml("educationLevel", "Niveau d'études", newData.educationLevel, existingData.educationLevel)}
                 </div>
                 <div>
-                    ${generateFieldHtml("domain", "Domaine", newData.domain, existingData.domain)}
-                    ${generateFieldHtml("target", "Cible", newData.target, existingData.target)}
-                    ${generateFieldHtml("exp", "Expérience (ans)", newData.experience, existingData.experience)}
+                    ${generateFieldHtml("primaryDomain", "Domaine", newData.primaryDomain, existingData.primaryDomain)}
+                    ${generateFieldHtml("targetRole", "Objectif professionnel", newData.targetRole, existingData.targetRole)}
+                    ${generateFieldHtml("experienceYears", "Expérience (ans)", newData.experienceYears, existingData.experienceYears)}
                 </div>
             `;
     }
@@ -238,17 +235,22 @@ const CVUpload = {
         const select = document.getElementById(`conflict-${id}`);
         if (select) return select.value;
         const div = document.getElementById(`det-${id}`);
-        if (div) return div.getAttribute("data-value");
+        if (div) return div.getAttribute("data-value") || null;
         return fallback;
       };
 
       const finalProfile = {
-        name: getFinalVal("name", newData.name),
+        firstName: newData.firstName,
+        lastName: newData.lastName,
+        fullName: getFinalVal("fullName", newData.fullName),
         city: getFinalVal("city", newData.city),
-        education: getFinalVal("edu", newData.education),
-        domain: getFinalVal("domain", newData.domain),
-        target: getFinalVal("target", newData.target),
-        experience: getFinalVal("exp", newData.experience),
+        country: newData.country,
+        educationLevel: getFinalVal("educationLevel", newData.educationLevel),
+        primaryDomain: getFinalVal("primaryDomain", newData.primaryDomain),
+        secondaryDomains: newData.secondaryDomains,
+        targetRole: getFinalVal("targetRole", newData.targetRole),
+        experienceYears: getFinalVal("experienceYears", newData.experienceYears),
+        experienceLevel: newData.experienceLevel
       };
 
       analysisResult.profile = finalProfile;

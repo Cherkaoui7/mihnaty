@@ -11,6 +11,8 @@ Extract only information supported by the CV.
 Do not invent experience. Do not infer skills without evidence.
 If an information is missing (like name or city), set it to null or "Non détecté". Do NOT hallucinate.
 
+IMPORTANT — skill levels: For each skill, always return a numeric "level" between 0 and 100 estimating proficiency based on the evidence found in the CV (years of use, projects, certifications, recency). Use your judgment: frequent recent professional use = 75-95, solid experience = 60-75, academic or project-only use = 40-60, basic exposure = 20-40. NEVER return null for "level". If evidence is very weak, return a low number (e.g. 20), not null.
+
 Identify:
 - first name and last name
 - city and country

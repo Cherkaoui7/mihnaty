@@ -1,6 +1,10 @@
 const Components = {
   renderSkillTag(skill) {
-    return `<span class="tag" style="background:var(--blue-light); color:var(--blue); border:1px solid var(--blue);">${skill.name} (${skill.level}%)</span>`;
+    // Accept numbers or numeric strings ("85"); anything else (null, undefined) is not displayed
+    const raw = Number(skill.level);
+    const level = Number.isFinite(raw) ? Math.round(raw) : null;
+    const levelHtml = level !== null ? ` (${level}%)` : "";
+    return `<span class="tag" style="background:var(--blue-light); color:var(--blue); border:1px solid var(--blue);">${skill.name}${levelHtml}</span>`;
   },
 
   renderSkillToDevelop(skill) {

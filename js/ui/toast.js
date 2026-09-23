@@ -35,10 +35,10 @@ const UI = {
     if (greeting) {
       if (
         State.profile &&
-        State.profile.name &&
-        State.profile.name !== "Non détecté"
+        State.profile.fullName &&
+        State.profile.fullName !== "Non détecté"
       ) {
-        greeting.innerText = `Bonjour ${State.profile.name.split(" ")[0]}`;
+        greeting.innerText = `Bonjour ${State.profile.fullName.split(" ")[0]}`;
       } else {
         greeting.innerText = "Bonjour 👋";
       }

@@ -1,12 +1,12 @@
 const SearchCache = {
-  get(key) {
+  get(key, ttlMinutes = 30) {
     try {
-      const item = sessionStorage.getItem(`mihnati_search_${key}`);
+      const item = localStorage.getItem(`mihnati_search_${key}`);
       if (!item) return null;
       const parsed = JSON.parse(item);
 
-      // Expire after 30 minutes
-      if (Date.now() - parsed.timestamp > 30 * 60 * 1000) {
+      // Expire after TTL
+      if (Date.now() - parsed.timestamp > ttlMinutes * 60 * 1000) {
         this.remove(key);
         return null;
       }
@@ -17,7 +17,7 @@ const SearchCache = {
   },
 
   set(key, data) {
-    sessionStorage.setItem(
+    localStorage.setItem(
       `mihnati_search_${key}`,
       JSON.stringify({
         timestamp: Date.now(),
@@ -27,12 +27,12 @@ const SearchCache = {
   },
 
   remove(key) {
-    sessionStorage.removeItem(`mihnati_search_${key}`);
+    localStorage.removeItem(`mihnati_search_${key}`);
   },
 
   clearAll() {
-    Object.keys(sessionStorage)
+    Object.keys(localStorage)
       .filter((k) => k.startsWith("mihnati_search_"))
-      .forEach((k) => sessionStorage.removeItem(k));
+      .forEach((k) => localStorage.removeItem(k));
   },
 };

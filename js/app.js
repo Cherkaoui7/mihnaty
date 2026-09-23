@@ -1,38 +1,49 @@
 const App = {
+  navigate(hash) {
+    window.location.hash = `#${hash}`;
+  },
+  
   viewControllers: {
     async dashboard() {
       UI.updateGreeting();
       const skillsDiv = document.getElementById("dashboard-skills");
       const developDiv = document.getElementById("dashboard-to-develop");
       const modeBadge = document.getElementById("live-demo-badge");
+      const isDemo =
+        typeof DemoState !== "undefined" && DemoState.isActive;
+      const analysis = isDemo
+        ? DemoState.data || (typeof DemoData !== "undefined" ? DemoData : null)
+        : State.analysis;
+      const dashboardProfile = analysis ? analysis.profile || {} : {};
 
       if (
-        State.profile &&
-        State.profile.name &&
-        State.profile.name !== "Non détecté"
+        dashboardProfile.fullName &&
+        dashboardProfile.fullName !== "Non détecté"
       ) {
         document.getElementById("dashboard-user-name").innerText =
-          State.profile.name.split(" ")[0];
+          dashboardProfile.fullName.split(" ")[0];
       } else {
         document.getElementById("dashboard-user-name").innerText = "👋";
       }
 
       const isLive = State.aiConfig && State.aiConfig.apiKey;
       if (modeBadge) {
-        modeBadge.innerHTML = isLive
-          ? `<span class="tag" style="background:#e0f2fe; color:#0284c7;">LIVE DATA MODE</span>`
-          : `<span class="tag tag-medium">DEMO MODE</span>`;
+        modeBadge.innerHTML = isDemo
+          ? `<span class="tag tag-medium">MODE DÉMO</span>`
+          : isLive
+            ? `<span class="tag" style="background:#e0f2fe; color:#0284c7;">MODE RÉEL</span>`
+            : `<span class="tag" style="background:#f1f5f9; color:#475569;">ESPACE PRODUCTION</span>`;
       }
 
-      if (State.analysis) {
-        const profile = State.analysis.profile || {};
+      if (analysis) {
+        const profile = dashboardProfile;
         document.getElementById("dash-role").innerText =
           profile.targetRole || "-";
         document.getElementById("dash-sector").innerText =
-          profile.domain || "-";
+          profile.primaryDomain || profile.domain || "-";
 
-        const skills = State.analysis.skills || [];
-        const toDevelop = State.analysis.skillsToDevelop || [];
+        const skills = analysis.skills || [];
+        const toDevelop = analysis.skillsToDevelop || [];
 
         document.getElementById("dash-skills-count").innerText = skills.length;
         document.getElementById("dash-gaps-count").innerText = toDevelop.length;
@@ -57,35 +68,32 @@ const App = {
           "dashboard-courses-preview",
         );
 
-        try {
-          jobsPreview.innerHTML = "<i>Recherche...</i>";
-          const jobs = await WebSearch.searchJobs(State.analysis, false);
-          jobsPreview.innerHTML = jobs.length
-            ? jobs
-                .slice(0, 2)
-                .map((j) => Components.renderJobCard(j, State.analysis))
-                .join("")
-            : "<i>Aucune opportunité trouvée.</i>";
-        } catch (e) {
-          jobsPreview.innerHTML = "<i>Recherche impossible actuellement.</i>";
-        }
+        // Fetch previews ONLY from cache
+        const cachedJobs = isDemo
+          ? (typeof DemoData !== "undefined" ? DemoData.jobs : [])
+          : SearchCache.get("jobs", 10) || [];
+        jobsPreview.innerHTML = cachedJobs.length
+          ? cachedJobs
+              .slice(0, 2)
+              .map((j) => Components.renderJobCard(j, analysis))
+              .join("")
+          : "<i>Allez dans l'onglet Opportunités pour lancer la recherche.</i>";
 
-        try {
-          coursesPreview.innerHTML = "<i>Recherche...</i>";
-          const courses = await WebSearch.searchCourses(State.analysis, false);
-          coursesPreview.innerHTML = courses.length
-            ? courses
-                .slice(0, 2)
-                .map((c) => Components.renderCourseCard(c))
-                .join("")
-            : "<i>Aucune formation trouvée.</i>";
-        } catch (e) {
-          coursesPreview.innerHTML =
-            "<i>Recherche impossible actuellement.</i>";
-        }
+        const cachedCourses = isDemo
+          ? (typeof DemoData !== "undefined" ? DemoData.courses : [])
+          : SearchCache.get("courses", 30) || [];
+        coursesPreview.innerHTML = cachedCourses.length
+          ? cachedCourses
+              .slice(0, 2)
+              .map((c) => Components.renderCourseCard(c))
+              .join("")
+          : "<i>Allez dans l'onglet Formations pour lancer la recherche.</i>";
       } else {
-        skillsDiv.innerHTML = "<i>Veuillez d'abord analyser votre CV.</i>";
-        developDiv.innerHTML = "";
+        skillsDiv.innerHTML = `<div style="color:var(--text-muted); line-height:1.6;">
+          Votre espace production est prêt. Ajoutez votre CV pour recevoir des recommandations personnalisées.
+          <div style="margin-top:1rem;"><button class="btn btn-primary" onclick="App.navigate('upload')">Analyser mon CV</button></div>
+        </div>`;
+        developDiv.innerHTML = "<i>Les compétences à développer apparaîtront après l'analyse de votre CV.</i>";
       }
     },
 
@@ -93,18 +101,18 @@ const App = {
       const form = document.getElementById("profile-form");
       if (State.profile) {
         document.getElementById("profile-name").value =
-          State.profile.name || "";
+          State.profile.fullName || "";
         document.getElementById("profile-city").value =
           State.profile.city || "";
         document.getElementById("profile-education").value =
-          State.profile.education || "";
+          State.profile.educationLevel || "";
         document.getElementById("profile-domain").value =
-          State.profile.domain || "";
+          State.profile.primaryDomain || "";
         document.getElementById("profile-target").value =
-          State.profile.target || State.profile.targetRole || "";
+          State.profile.targetRole || "";
         if (document.getElementById("profile-experience")) {
           document.getElementById("profile-experience").value =
-            State.profile.experience || "";
+            State.profile.experienceYears || "";
         }
       }
 
@@ -117,12 +125,12 @@ const App = {
       form.onsubmit = (e) => {
         e.preventDefault();
         State.updateProfile({
-          name: document.getElementById("profile-name").value,
+          fullName: document.getElementById("profile-name").value,
           city: document.getElementById("profile-city").value,
-          education: document.getElementById("profile-education").value,
-          domain: document.getElementById("profile-domain").value,
-          target: document.getElementById("profile-target").value,
-          experience: document.getElementById("profile-experience").value,
+          educationLevel: document.getElementById("profile-education").value,
+          primaryDomain: document.getElementById("profile-domain").value,
+          targetRole: document.getElementById("profile-target").value,
+          experienceYears: document.getElementById("profile-experience").value,
         });
 
         // Mettre à jour l'analyse si elle existe pour qu'elle reflète les modifications
@@ -142,23 +150,58 @@ const App = {
     settings() {
       const updateUI = () => {
         const config = State.aiConfig;
-        const disconnectedView = document.getElementById(
-          "ai-disconnected-view",
-        );
+        const disconnectedView = document.getElementById("ai-disconnected-view");
         const connectedView = document.getElementById("ai-connected-view");
-        const advancedContainer = document.getElementById(
-          "ai-advanced-container",
-        );
+        const advancedContainer = document.getElementById("ai-advanced-container");
 
         if (config && config.apiKey) {
           disconnectedView.style.display = "none";
           advancedContainer.style.display = "none";
           connectedView.style.display = "block";
 
-          const adapter = ProviderRegistry.getAdapter(config.provider);
-          document.getElementById("ai-detected-provider").textContent = adapter
-            ? adapter.name
-            : config.provider;
+          const def = ProviderRegistry.get(config.provider);
+          document.getElementById("ai-detected-provider").textContent = def ? def.name : config.provider;
+          
+          const modelSpan = document.getElementById("ai-detected-model");
+          const modelSelect = document.getElementById("ai-model-select");
+          
+          if (config.availableModels && config.availableModels.length > 0) {
+              modelSpan.style.display = "none";
+              modelSelect.style.display = "inline-block";
+              modelSelect.innerHTML = "";
+              // Put auto:free or selected model first, or just list all
+              config.availableModels.forEach(m => {
+                  const opt = document.createElement("option");
+                  opt.value = m;
+                  opt.textContent = m === "auto:free" ? "Auto — Free" : m;
+                  if (m === config.model) opt.selected = true;
+                  modelSelect.appendChild(opt);
+              });
+              modelSelect.onchange = (e) => {
+                  config.model = e.target.value;
+                  State.updateAIConfig(config);
+              };
+          } else {
+              modelSelect.style.display = "none";
+              modelSpan.style.display = "inline";
+              let displayModel = config.model || (def ? def.defaultModel : "Automatique");
+              if (displayModel === "auto:free") displayModel = "Auto — Free";
+              modelSpan.textContent = displayModel;
+          }
+
+          const blOptions = document.getElementById("bl-options");
+          if (blOptions) {
+              blOptions.style.display = config.provider === 'bazaarlink' ? "block" : "none";
+          }
+          const fallbackCb = document.getElementById("ai-free-fallback");
+          if (fallbackCb) {
+              fallbackCb.checked = config.freeOnly !== false; // defaults to true
+              fallbackCb.onchange = (e) => {
+                 config.freeOnly = e.target.checked;
+                 State.updateAIConfig(config);
+              };
+          }
+
           document.getElementById("ai-masked-key").textContent =
             config.apiKey.substring(0, 4) +
             "•".repeat(10) +
@@ -168,130 +211,173 @@ const App = {
         } else {
           disconnectedView.style.display = "block";
           connectedView.style.display = "none";
-          advancedContainer.style.display = "block";
+          advancedContainer.style.display = "none";
         }
       };
 
       updateUI();
 
-      // Toggle advanced settings
-      document.getElementById("ai-advanced-toggle").onclick = () => {
-        const wrap = document.getElementById("ai-advanced-form-wrap");
-        wrap.style.display = wrap.style.display === "none" ? "block" : "none";
-      };
+      // Populate advanced providers
+      const advProviderSelect = document.getElementById("adv-provider");
+      if (advProviderSelect) {
+        advProviderSelect.innerHTML = "";
+        ProviderRegistry.getAll().forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.textContent = p.name;
+          advProviderSelect.appendChild(opt);
+        });
+        
+        const updateAdvancedFields = () => {
+          const providerId = advProviderSelect.value;
+          const def = ProviderRegistry.get(providerId);
+          
+          if (providerId === "custom") {
+             document.getElementById("adv-endpoint-group").style.display = "block";
+          } else {
+             document.getElementById("adv-endpoint-group").style.display = "none";
+          }
+          
+          document.getElementById("adv-model").placeholder = (def && def.defaultModel) ? `Défaut : ${def.defaultModel}` : "Modèle par défaut ▼";
+        };
+        
+        advProviderSelect.addEventListener("change", updateAdvancedFields);
+        updateAdvancedFields();
+      }
 
       // Main Connect Form
-      document.getElementById("ai-connect-form").onsubmit = async (e) => {
-        e.preventDefault();
-        const key = document.getElementById("ai-key-input").value.trim();
-        if (!key) return;
+      const connectForm = document.getElementById("ai-connect-form");
+      if (connectForm) {
+        connectForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const key = document.getElementById("ai-key-input").value.trim();
+          if (!key) return;
 
-        const btn = document.getElementById("ai-connect-btn");
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = "Connexion en cours...";
+          const btn = document.getElementById("ai-connect-btn");
+          const originalText = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = "Connexion en cours...";
 
-        try {
-          const config = await ProviderDetector.detect(key);
-          if (config) {
-            State.updateAIConfig(config);
-            UI.showToast(
-              `Connecté avec succès à ${ProviderRegistry.getAdapter(config.provider).name}`,
-              "success",
-            );
-            document.getElementById("ai-connect-form").reset();
-            document.getElementById("ai-advanced-form-wrap").style.display =
-              "none";
-            document.getElementById("ai-detection-error").style.display =
-              "none";
-            updateUI();
-          } else {
-            document.getElementById("ai-detection-error").style.display =
-              "block";
-            document.getElementById("ai-advanced-form-wrap").style.display =
-              "block";
-            document.getElementById("adv-key").value = key; // Pre-fill
-            UI.showToast(
-              "Impossible d'identifier automatiquement le fournisseur.",
-              "error",
-            );
+          try {
+            const config = await ProviderDetector.detect(key);
+            if (config) {
+              State.updateAIConfig(config);
+              const def = ProviderRegistry.get(config.provider);
+              UI.showToast(
+                `Connecté avec succès à ${def ? def.name : config.provider}`,
+                "success",
+              );
+              connectForm.reset();
+              document.getElementById("ai-advanced-container").style.display = "none";
+              document.getElementById("ai-detection-error").style.display = "none";
+              updateUI();
+            } else {
+              document.getElementById("ai-detection-error").style.display = "block";
+              document.getElementById("ai-advanced-container").style.display = "block";
+              document.getElementById("adv-key").value = key; // Pre-fill
+              document.getElementById("ai-advanced-container").scrollIntoView({ behavior: 'smooth' });
+              UI.showToast(
+                "Impossible d'identifier automatiquement le fournisseur.",
+                "error",
+              );
+            }
+          } catch (err) {
+              document.getElementById('ai-detection-error').style.display = 'block';
+              document.getElementById('ai-advanced-container').style.display = 'block';
+              document.getElementById('adv-key').value = key;
+              document.getElementById('ai-advanced-container').scrollIntoView({ behavior: 'smooth' });
+              UI.showToast(getUserFriendlyProviderError(err), 'error');
+            } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
           }
-        } catch (err) {
-          UI.showToast("Erreur lors de la connexion.", "error");
-        } finally {
-          btn.disabled = false;
-          btn.textContent = originalText;
-        }
-      };
+        };
+      }
 
       // Advanced Connect Form
-      document.getElementById("ai-advanced-form").onsubmit = async (e) => {
-        e.preventDefault();
-        const provider = document.getElementById("adv-provider").value;
-        const endpoint = document.getElementById("adv-endpoint").value.trim();
-        const model = document.getElementById("adv-model").value.trim();
-        const key = document.getElementById("adv-key").value.trim();
+      const advForm = document.getElementById("ai-advanced-form");
+      if (advForm) {
+        advForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const provider = document.getElementById("adv-provider").value;
+          const endpoint = document.getElementById("adv-endpoint").value.trim();
+          const model = document.getElementById("adv-model").value.trim();
+          const key = document.getElementById("adv-key").value.trim();
 
-        if (!key) return;
+          if (!key) return;
 
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = "Test en cours...";
+          const btn = e.target.querySelector('button[type="submit"]');
+          const originalText = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = "Test en cours...";
 
-        const config = { provider, endpoint, model, apiKey: key };
-        try {
-          const isValid = await AIManager.testConnection(config);
-          if (isValid) {
-            State.updateAIConfig(config);
-            UI.showToast("Connexion manuelle réussie.", "success");
-            document.getElementById("ai-advanced-form").reset();
-            updateUI();
-          } else {
-            throw new Error("Le test a échoué.");
+          const config = { provider, endpoint, model, apiKey: key };
+          try {
+            const isValid = await AIManager.testConnection(config);
+            if (isValid) {
+              State.updateAIConfig(config);
+              UI.showToast("Connexion manuelle réussie.", "success");
+              advForm.reset();
+              document.getElementById("ai-advanced-container").style.display = "none";
+              updateUI();
+            } else {
+              throw new Error("Validation échouée.");
+            }
+          } catch (err) {
+            UI.showToast(getUserFriendlyProviderError(err), "error");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
           }
-        } catch (err) {
-          UI.showToast(
-            "La connexion a échoué. Vérifiez vos paramètres.",
-            "error",
-          );
-        } finally {
-          btn.disabled = false;
-          btn.textContent = originalText;
-        }
-      };
+        };
+      }
+
+      const changeBtn = document.getElementById("ai-change-btn");
+      if (changeBtn) {
+        changeBtn.onclick = () => {
+          document.getElementById("ai-advanced-container").style.display = "block";
+          document.getElementById("ai-detection-error").style.display = "none";
+          document.getElementById("ai-advanced-container").scrollIntoView({ behavior: 'smooth' });
+        };
+      }
 
       // Disconnect
-      document.getElementById("ai-disconnect-btn").onclick = () => {
-        State.updateAIConfig(null);
-        UI.showToast("Votre connexion IA a été supprimée.", "success");
-        updateUI();
-      };
+      const disconnectBtn = document.getElementById("ai-disconnect-btn");
+      if (disconnectBtn) {
+        disconnectBtn.onclick = () => {
+          State.updateAIConfig(null);
+          UI.showToast("Votre connexion IA a été supprimée.", "success");
+          updateUI();
+        };
+      }
 
       // Test connection manually
-      document.getElementById("ai-test-btn").onclick = async () => {
-        const btn = document.getElementById("ai-test-btn");
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = "Test...";
+      const testBtn = document.getElementById("ai-test-btn");
+      if (testBtn) {
+        testBtn.onclick = async () => {
+          const config = State.aiConfig;
+          if (!config) return;
 
-        try {
-          const isValid = await AIManager.testConnection(State.aiConfig);
-          if (isValid) {
-            UI.showToast("Test réussi : La connexion est active.", "success");
-          } else {
-            throw new Error("Échec");
+          const btn = document.getElementById("ai-test-btn");
+          const originalText = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = "Test...";
+
+          try {
+            const isValid = await AIManager.testConnection(config);
+            if (isValid) {
+              UI.showToast("Test réussi : La connexion est active.", "success");
+            } else {
+              throw new Error("Échec");
+            }
+          } catch (e) {
+            UI.showToast(getUserFriendlyProviderError(e), "error");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
           }
-        } catch (e) {
-          UI.showToast(
-            "Test échoué : La connexion est inactive ou la clé est invalide.",
-            "error",
-          );
-        } finally {
-          btn.disabled = false;
-          btn.textContent = originalText;
-        }
-      };
+        };
+      }
 
       document.getElementById("reset-all-btn").onclick = () => {
         if (confirm("Voulez-vous vraiment supprimer TOUTES les données ?")) {
@@ -342,7 +428,29 @@ const App = {
             ? results.map((c) => Components.renderCourseCard(c)).join("")
             : "<i>Aucune formation trouvée pour ce profil.</i>";
         } catch (e) {
-          container.innerHTML = `<i>Erreur: ${e.message}</i>`;
+          if (e.message.includes("Quota IA épuisé")) {
+            container.innerHTML = `
+              <div style="background: #fff3cd; color: #856404; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem;">
+                <h4>Recherche Web temporairement indisponible</h4>
+                <p style="margin-bottom: 0.5rem;">Le quota de votre fournisseur IA a été atteint.</p>
+                <p style="margin-bottom: 1rem;">Vos données déjà analysées restent disponibles.</p>
+                <button class="btn btn-secondary" onclick="App.navigate('courses')">Réessayer plus tard</button>
+              </div>
+            `;
+          } else if (e.message.includes("prend pas en charge la recherche Web")) {
+            container.innerHTML = `
+              <div style="background: #fff1f2; color: #be123c; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem;">
+                <h4>Fonctionnalité non supportée</h4>
+                <p style="margin-bottom: 1rem;">Votre fournisseur actuel ne prend pas en charge la recherche Web nécessaire à cette fonctionnalité.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem;">
+                  <button class="btn btn-primary" onclick="App.navigate('settings')">Changer de fournisseur</button>
+                  <button class="btn btn-secondary" onclick="App.navigate('demo')">Utiliser le mode démo</button>
+                </div>
+              </div>
+            `;
+          } else {
+            container.innerHTML = `<i style="color:red;">Erreur: ${e.message}</i>`;
+          }
         }
       };
 
@@ -375,7 +483,29 @@ const App = {
             ? results.map((j) => Components.renderJobCard(j, profile)).join("")
             : "<i>Aucune opportunité trouvée.</i>";
         } catch (e) {
-          container.innerHTML = `<i>Erreur: ${e.message}</i>`;
+          if (e.message.includes("Quota IA épuisé")) {
+            container.innerHTML = `
+              <div style="background: #fff3cd; color: #856404; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem;">
+                <h4>Recherche Web temporairement indisponible</h4>
+                <p style="margin-bottom: 0.5rem;">Le quota de votre fournisseur IA a été atteint.</p>
+                <p style="margin-bottom: 1rem;">Vos données déjà analysées restent disponibles.</p>
+                <button class="btn btn-secondary" onclick="App.navigate('opportunities')">Réessayer plus tard</button>
+              </div>
+            `;
+          } else if (e.message.includes("prend pas en charge la recherche Web")) {
+            container.innerHTML = `
+              <div style="background: #fff1f2; color: #be123c; padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1rem;">
+                <h4>Fonctionnalité non supportée</h4>
+                <p style="margin-bottom: 1rem;">Votre fournisseur actuel ne prend pas en charge la recherche Web nécessaire à cette fonctionnalité.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem;">
+                  <button class="btn btn-primary" onclick="App.navigate('settings')">Changer de fournisseur</button>
+                  <button class="btn btn-secondary" onclick="App.navigate('demo')">Utiliser le mode démo</button>
+                </div>
+              </div>
+            `;
+          } else {
+            container.innerHTML = `<i style="color:red;">Erreur: ${e.message}</i>`;
+          }
         }
       };
 

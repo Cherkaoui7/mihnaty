@@ -79,6 +79,10 @@
     <script src="js/data/courses.js"></script>
     <script src="js/data/opportunities.js"></script>
     <script src="js/mock/mock-data.js"></script>
+    <!-- Demo dependencies must load before the router: it checks DemoState on every route. -->
+    <script src="js/demo/demo-data.js"></script>
+    <script src="js/demo/demo-state.js"></script>
+    <script src="js/demo/demo-service.js"></script>
     <script src="js/ai/schema.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/state.js"></script>
@@ -90,10 +94,14 @@
     <script src="js/matching/course-score.js"></script>
 
     <!-- AI & Search -->
+    <script src="js/utils/api-fetch.js"></script>
     <script src="js/ai/providers/gemini-adapter.js"></script>
-    <script src="js/ai/providers/openai-adapter.js"></script>
+    <script src="js/ai/providers/openai-compatible-adapter.js"></script>
+    <script src="js/ai/providers/anthropic-adapter.js"></script>
+    <script src="js/ai/providers/cohere-adapter.js"></script>
     <script src="js/ai/providers/provider-registry.js"></script>
     <script src="js/ai/providers/provider-detector.js"></script>
+    <script src="js/ai/response-normalizer.js"></script>
     <script src="js/ai/prompt-builder.js"></script>
     <script src="js/ai/ai-manager.js"></script>
     <script src="js/search/normalizer.js"></script>

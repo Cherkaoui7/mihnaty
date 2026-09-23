@@ -95,29 +95,25 @@ const Views = {
             </form>
         </div>
     `,
-  settings: `
+    settings: `
         <div class="card">
             <h2 class="card-header">Connecter mon IA</h2>
             
             <!-- ETAT: NON CONNECTÉ -->
             <div id="ai-disconnected-view">
                 <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
-                    Utilisez votre propre clé API pour permettre à Mihnati d'analyser votre CV et de personnaliser vos recommandations.
+                    Utilisez votre propre clé API pour faire fonctionner l'intelligence artificielle de Mihnati.
                 </p>
                 <form id="ai-connect-form">
                     <div class="form-group">
-                        <label class="form-label" style="font-weight: bold;">Votre clé API</label>
+                        <label class="form-label" style="font-weight: bold;">Votre clé API :</label>
                         <input type="password" id="ai-key-input" class="form-control" required placeholder="Collez votre clé ici">
                     </div>
-                    
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-                        💡 Nous essayons automatiquement d'identifier votre fournisseur.
-                    </p>
                     
                     <button type="submit" id="ai-connect-btn" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 1rem;">Connecter mon IA</button>
                     
                     <div style="text-align: center; font-size: 0.85rem; color: #475569; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <span style="font-size: 1.2rem;">🔒</span> Votre clé reste uniquement dans votre navigateur pendant cette session.
+                        <span style="font-size: 1.2rem;">🔒</span> Votre clé reste uniquement dans cette session.
                     </div>
                 </form>
             </div>
@@ -127,57 +123,63 @@ const Views = {
                 <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
                     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
                         <div style="width: 40px; height: 40px; border-radius: 50%; background: #22c55e; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                            ✓
+                            🟢
                         </div>
                         <div>
                             <h3 style="margin: 0; color: #166534;">IA Connectée</h3>
-                            <p style="margin: 0; color: #15803d; font-size: 0.9rem;" id="ai-status-text">Prêt à analyser votre CV.</p>
                         </div>
                     </div>
-                    <div style="font-size: 0.9rem; color: #166534;">
+                    <div style="font-size: 0.9rem; color: #166534; margin-bottom: 1.5rem;">
                         <strong>Fournisseur :</strong> <span id="ai-detected-provider">...</span><br>
-                        <strong>Modèle :</strong> automatique<br>
-                        <strong>Clé :</strong> <span id="ai-masked-key">••••••••••••••••</span>
+                        <strong>Mod�le :</strong> <span id='ai-detected-model'>Automatique</span> <select id='ai-model-select' style='display:none; margin-left: 0.5rem; padding: 0.2rem; max-width: 200px; display: inline-block;'></select><br>
+                        <strong>Clé :</strong> <span id="ai-masked-key">••••••••••••••</span>
                     </div>
-                </div>
-                
-                <div style="display:flex; gap:1rem;">
-                    <button id="ai-test-btn" class="btn btn-secondary">Tester la connexion</button>
-                    <button id="ai-disconnect-btn" class="btn btn-secondary" style="color: var(--red); border-color: var(--red);">Supprimer l'IA</button>
+                    
+                    <div style="display:flex; gap:1rem;">
+                        <button id="ai-test-btn" class="btn btn-secondary">Tester</button>
+                        <button id="ai-change-btn" class="btn btn-secondary">Changer</button>
+                        <button id="ai-disconnect-btn" class="btn btn-secondary" style="color: var(--red); border-color: var(--red);">Supprimer</button>
+                    </div>
+                    <div id="bl-options" style="display:none; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer;">
+                            <input type="checkbox" id="ai-free-fallback" checked>
+                            Utiliser uniquement les modèles gratuits
+                        </label>
+                    </div>
                 </div>
             </div>
 
             <!-- ETAT: FALLBACK / AVANCÉ -->
-            <div id="ai-advanced-container" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
-                <button type="button" id="ai-advanced-toggle" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; text-decoration: underline;">Configuration avancée</button>
-                
-                <div id="ai-advanced-form-wrap" style="display:none; margin-top: 1rem;">
-                    <div style="margin-bottom: 1rem; padding: 1rem; background: #fff1f2; border-left: 4px solid #f43f5e; font-size: 0.9rem; display:none;" id="ai-detection-error">
-                        Impossible d'identifier automatiquement votre fournisseur.
-                    </div>
-                    <form id="ai-advanced-form">
-                        <div class="form-group">
-                            <label class="form-label">Fournisseur</label>
-                            <select id="adv-provider" class="form-control">
-                                <option value="gemini">Google Gemini</option>
-                                <option value="openai">OpenAI / Compatible (Groq, Mistral...)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Endpoint API (Optionnel)</label>
-                            <input type="text" id="adv-endpoint" class="form-control" placeholder="Laisser vide pour la valeur par défaut">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Nom du Modèle (Optionnel)</label>
-                            <input type="text" id="adv-model" class="form-control" placeholder="Laisser vide pour la valeur par défaut">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Clé API</label>
-                            <input type="password" id="adv-key" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-secondary">Enregistrer la configuration manuelle</button>
-                    </form>
+            <div id="ai-advanced-container" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; display:none;">
+                <div style="margin-bottom: 1rem; padding: 1rem; background: #fff1f2; border-left: 4px solid #f43f5e; font-size: 0.9rem; display:none;" id="ai-detection-error">
+                    Nous n'avons pas pu identifier automatiquement votre fournisseur.
                 </div>
+                
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Choisir mon fournisseur</h3>
+                <form id="ai-advanced-form">
+                    <div class="form-group">
+                        <select id="adv-provider" class="form-control">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="adv-endpoint-group" style="display:none;">
+                        <label class="form-label">Endpoint API</label>
+                        <input type="text" id="adv-endpoint" class="form-control" placeholder="Obligatoire pour Custom">
+                    </div>
+                    
+                    <div class="form-group" id="adv-model-group">
+                        <label class="form-label">Modèle</label>
+                        <input type="text" id="adv-model" class="form-control" placeholder="modèle par défaut ▼">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Clé API</label>
+                        <input type="password" id="adv-key" class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-secondary">Connecter</button>
+                </form>
             </div>
         </div>
         
@@ -235,8 +237,7 @@ const Views = {
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
                         Nous avons extrait ces informations de votre CV. Vérifiez-les avant de continuer.
                     </p>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
                         <div>
                             <strong>Prénom & Nom</strong><br>
                             <span id="det-name" style="color: var(--text-muted);">...</span>
