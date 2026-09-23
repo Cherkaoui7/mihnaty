@@ -1,0 +1,116 @@
+const PromptBuilder = {
+  buildCVAnalysisPrompt(cvText, userProfile) {
+    let profileContext = "";
+    if (userProfile && userProfile.primaryDomain) {
+      profileContext = `Le candidat a pré-sélectionné le domaine : ${userProfile.primaryDomain}. Vérifie si cela correspond au CV.`;
+    }
+
+    return `
+You are analyzing a professional CV.
+Extract only information supported by the CV.
+Do not invent experience. Do not infer skills without evidence.
+If an information is missing (like name or city), set it to null or "Non détecté". Do NOT hallucinate.
+
+Identify:
+- first name and last name
+- city and country
+- education level (e.g., Bac+3, Master)
+- primary domain/professional sector (e.g., Informatique, Marketing, Ressources humaines, Comptabilité / Finance, Commerce / Vente, Gestion, Logistique, Industrie, Tourisme / Hôtellerie, Design, Autre)
+- target roles
+- experience years (number)
+- technical skills
+- transferable skills
+- languages
+- certifications
+- skill gaps (what is missing to reach the target role)
+
+${profileContext}
+
+CV CONTENT:
+---
+${cvText.substring(0, 15000)}
+---
+
+Return valid structured JSON matching this schema:
+${AI_JSON_SCHEMA}
+`;
+  },
+
+  buildJobSearchPrompt(profile) {
+    return `
+You are finding CURRENT PUBLIC job and internship opportunities for a candidate in Morocco.
+
+Candidate sector: ${profile.primaryDomain || profile.domain}
+Target role: ${profile.targetRole}
+Experience level: ${profile.experienceYears != null ? profile.experienceYears + " ans" : profile.experienceLevel || ""}
+Skills: ${(profile.skills || []).map((s) => s.name).join(", ")}
+Skills to develop: ${(profile.skillsToDevelop || []).map((s) => s.name).join(", ")}
+Location: Maroc (prioritize remote, Rabat, Casablanca, Tanger, etc.)
+
+Search the public web using Google Search grounding.
+Prefer official and reputable sources (company career pages, reputable job platforms, LinkedIn, Rekrute, etc.).
+
+Return ONLY verifiable opportunities that currently exist and provide the exact source URL.
+Do not invent companies, titles, URLs, dates, skills or salaries.
+
+Return a JSON array of up to 5 best matching opportunities.
+Format:
+{
+  "opportunities": [
+    {
+      "id": "unique-id",
+      "title": "Job title",
+      "company": "Company name",
+      "sector": "Sector name",
+      "location": "City or Remote",
+      "type": "CDI, CDD, Stage, or Freelance",
+      "experienceLevel": "Junior, Intermédiaire, or Senior",
+      "requiredSkills": ["skill1", "skill2"],
+      "preferredSkills": ["skill3"],
+      "description": "Short description",
+      "url": "https://exact-url-to-job",
+      "sourceDomain": "domain.com",
+      "publishedDate": "YYYY-MM-DD or null if unknown"
+    }
+  ]
+}
+`;
+  },
+
+  buildCourseSearchPrompt(profile) {
+    return `
+Find real training opportunities that help this user develop their missing skills.
+
+Sector: ${profile.primaryDomain || profile.domain}
+Target role: ${profile.targetRole}
+Skill gaps: ${(profile.skillsToDevelop || []).map((s) => s.name).join(", ")}
+Location: Maroc (or Online/Remote)
+
+Search the public web using Google Search grounding.
+Prefer official training providers, recognized platforms (Coursera, Udemy, local centers), and universities.
+
+Return ONLY verifiable resources with URLs.
+Do not invent price, duration, certification, organization or availability.
+
+Return a JSON array of up to 5 best matching courses.
+Format:
+{
+  "courses": [
+    {
+      "id": "unique-id",
+      "title": "Course title",
+      "provider": "Provider name",
+      "sector": "Sector name",
+      "skills": ["skill1", "skill2"],
+      "level": "Débutant, Intermédiaire, or Avancé",
+      "duration": "Duration or 'Non précisée'",
+      "format": "En ligne, Présentiel, or Hybride",
+      "price": "Price or 'Non précisé'",
+      "url": "https://exact-url-to-course",
+      "sourceDomain": "domain.com"
+    }
+  ]
+}
+`;
+  },
+};

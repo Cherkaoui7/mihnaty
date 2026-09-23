@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mihnati - L'orientation par les compétences</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-color), var(--surface-color));
+        }
+        .badge {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            border: 1px solid var(--primary-color);
+        }
+        h1 {
+            font-size: 3.5rem;
+            max-width: 800px;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        p.subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+        }
+        .features {
+            padding: 6rem 2rem;
+            background: #f8f6f0;
+            text-align: left;
+        }
+        .features-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .section-kicker {
+            color: #16a34a;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+        .features h2 {
+            font-size: 2.25rem;
+            color: #0f172a;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .features .section-subtitle {
+            font-size: 1.1rem;
+            color: #475569;
+            margin-bottom: 4rem;
+            line-height: 1.6;
+            max-width: 700px;
+        }
+        
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            position: relative;
+        }
+        /* Vertical line connecting steps */
+        .steps-list::before {
+            content: '';
+            position: absolute;
+            left: 1.25rem;
+            top: 2rem;
+            bottom: 1rem;
+            width: 1px;
+            background-color: #cbd5e1;
+            z-index: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-icon {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: #0f172a;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 8px; /* Slightly rounded square as in the image */
+            box-shadow: 0 0 0 4px #f8f6f0; /* Fake margin over the line */
+        }
+
+        .step-content {
+            flex-grow: 1;
+            padding-top: 0.25rem;
+        }
+
+        .step-content h3 {
+            font-size: 1.15rem;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .step-content p {
+            color: #64748b;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            margin: 0;
+            max-width: 600px;
+        }
+
+        .step-tag-container {
+            display: flex;
+            align-items: flex-start;
+            padding-top: 0.25rem;
+        }
+
+        .step-tag {
+            border: 1px solid #e2e8f0;
+            background-color: transparent;
+            color: #64748b;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        @media (max-width: 600px) {
+            .step-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .steps-list::before {
+                left: 1.25rem;
+            }
+            .step-tag-container {
+                padding-left: 4.5rem; /* Align under text */
+                padding-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="hero">
+            <div class="badge">Démo POC — multi-secteurs</div>
+            <h1>Déposez votre CV et laissez Mihnati analyser votre profil professionnel.</h1>
+            <p class="subtitle">Vos informations, compétences et objectifs peuvent être détectés automatiquement à partir de votre CV.</p>
+            <div style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                <span class="tag">Informatique</span>
+                <span class="tag">Marketing</span>
+                <span class="tag">Finance</span>
+                <span class="tag">RH</span>
+                <span class="tag">Commerce</span>
+                <span>et plus...</span>
+            </div>
+            <div class="cta-group">
+                <a href="app.html#upload" class="btn btn-primary btn-lg">Analyser mon CV</a>
+                <a href="app.html#demo" class="btn btn-secondary btn-lg">Voir la démo</a>
+            </div>
+        </section>
+        
+        <section class="features">
+            <div class="features-container">
+                <p class="section-kicker">COMMENT ÇA MARCHE</p>
+                <h2>Du CV à l’emploi, en cinq étapes.</h2>
+                <p class="section-subtitle">Un parcours guidé, pensé pour les jeunes marocains en recherche d'orientation — pas un réseau social professionnel de plus.</p>
+
+                <div class="steps-list">
+                    <div class="step-item">
+                        <div class="step-icon">01</div>
+                        <div class="step-content">
+                            <h3>Dépose ton CV</h3>
+                            <p>Glisse ton CV en PDF ou DOCX. L'extraction du texte se fait directement dans ton navigateur pour protéger tes données personnelles.</p>
+                        </div>
+                        <div class="step-tag-container">
+                            <span class="step-tag">CV</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-icon">02</div>
+                        <div class="step-content">
+                            <h3>Analyse IA de tes compétences</h3>
+                            <p>L'intelligence artificielle analyse ton profil pour extraire tes compétences techniques, ton niveau d'expérience et identifier ton secteur professionnel.</p>
+                        </div>
+                        <div class="step-tag-container">
+                            <span class="step-tag">IA</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-icon">03</div>
+                        <div class="step-content">
+                            <h3>Cartographie de ton profil</h3>
+                            <p>Visualise tes acquis et découvre instantanément les compétences manquantes nécessaires pour atteindre tes objectifs de carrière.</p>
+                        </div>
+                        <div class="step-tag-container">
+                            <span class="step-tag">PROFIL</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-icon">04</div>
+                        <div class="step-content">
+                            <h3>Formations recommandées</h3>
+                            <p>Le système effectue une recherche en direct sur le Web pour te suggérer les meilleures formations adaptées à tes lacunes.</p>
+                        </div>
+                        <div class="step-tag-container">
+                            <span class="step-tag">FORMATIONS</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-icon">05</div>
+                        <div class="step-content">
+                            <h3>Opportunités professionnelles</h3>
+                            <p>Découvre de vraies offres d'emploi actuelles (Live Web Search). Chaque offre affiche un score de compatibilité calculé sur mesure, point par point.</p>
+                        </div>
+                        <div class="step-tag-container">
+                            <span class="step-tag">MATCHING</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
