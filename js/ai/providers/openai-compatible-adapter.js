@@ -63,11 +63,26 @@ window.OpenAICompatibleAdapter = {
     const providerDef = ProviderRegistry.get(config.provider);
     let model = config.model || (providerDef ? providerDef.defaultModel : "");
     
-    let endpoint = config.endpoint || (providerDef ? providerDef.defaultEndpoint : "");
-    if (!endpoint.endsWith("/chat/completions") && !endpoint.includes("/models/")) {
-       if (endpoint.endsWith("/")) endpoint += "chat/completions";
-       else endpoint += "/chat/completions";
-    }
+    // Centralized endpoint normalization
+    const normalizeBaseUrl = (url) => {
+       if (!url) return "";
+       let clean = url.trim();
+       if (!clean.startsWith('https://') && !clean.startsWith('http://localhost') && !clean.startsWith('http://127.0.0.1')) {
+           throw new Error("L'endpoint doit commencer par https:// (ou http://localhost pour le développement).");
+       }
+       if (clean.endsWith("/")) clean = clean.slice(0, -1);
+       if (clean.endsWith("/chat/completions")) clean = clean.replace("/chat/completions", "");
+       if (clean.endsWith("/models")) clean = clean.replace("/models", "");
+       return clean;
+    };
+
+    const buildChatCompletionsUrl = (baseUrl) => {
+       const clean = normalizeBaseUrl(baseUrl);
+       return clean ? clean + "/chat/completions" : "";
+    };
+
+    let baseEndpoint = normalizeBaseUrl(config.endpoint || (providerDef ? providerDef.defaultEndpoint : ""));
+    let endpoint = buildChatCompletionsUrl(baseEndpoint);
 
     const body = {
       model: model,

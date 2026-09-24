@@ -97,10 +97,30 @@ const AIManager = {
     }
   },
 
+  isTesting: false,
+
   async testConnection(config) {
+    if (this.isTesting) throw new Error("Test déjà en cours.");
+    
+    const def = ProviderRegistry.get(config.provider);
+    if (!def) throw new Error("Fournisseur IA inconnu.");
+    
+    if (def.browserCors === false && !config.corsProxy) {
+      const err = new Error("CORS (Failed to fetch)");
+      err.name = "ProviderConnectionError";
+      err.provider = config.provider;
+      throw err;
+    }
+    
     const adapter = this._getAdapter(config.provider);
     if (!adapter) throw new Error("Fournisseur IA inconnu.");
-    return await adapter.testConnection(config);
+    
+    this.isTesting = true;
+    try {
+      return await adapter.testConnection(config);
+    } finally {
+      this.isTesting = false;
+    }
   },
 
   async generateWithSearch(prompt) {

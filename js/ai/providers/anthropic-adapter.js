@@ -23,6 +23,10 @@ window.AnthropicAdapter = {
     const providerDef = ProviderRegistry.get(config.provider);
     let model = config.model || (providerDef ? providerDef.defaultModel : "claude-3-haiku-20240307");
     let endpoint = config.endpoint || (providerDef ? providerDef.defaultEndpoint : "https://api.anthropic.com/v1/messages");
+    
+    if (endpoint && !endpoint.startsWith('https://') && !endpoint.startsWith('http://localhost') && !endpoint.startsWith('http://127.0.0.1')) {
+        throw new Error("L'endpoint doit commencer par https:// (ou http://localhost pour le développement).");
+    }
 
     const body = {
       model: model,

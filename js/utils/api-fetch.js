@@ -10,20 +10,6 @@
  * Usage: drop-in replacement for fetch(url, options).
  */
 window.apiFetch = function(url, options) {
-  // Only proxy if the target is an external URL
-  const isExternal = url.startsWith('http://') || url.startsWith('https://');
-  
-  // Only proxy when running on localhost (dev server) or file://
-  const needsProxy = window.location.protocol === 'file:' ||
-                     window.location.hostname === 'localhost' ||
-                     window.location.hostname === '127.0.0.1';
-
-  if (isExternal && needsProxy && window.location.protocol !== 'file:') {
-    // Route through the local CORS proxy
-    const proxyUrl = '/proxy?url=' + encodeURIComponent(url);
-    return fetch(proxyUrl, options);
-  }
-
-  // Direct fetch (production, or file:// where proxy isn't available)
+  // Direct fetch (production or dev), no proxies allowed
   return fetch(url, options);
 };

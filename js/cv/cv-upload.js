@@ -43,6 +43,10 @@ const CVUpload = {
       }
     });
 
+    dropZone.addEventListener("click", () => {
+      fileInput.click();
+    });
+
     fileInput.addEventListener("change", async (e) => {
       if (e.target.files.length) {
         await this.handleFile(e.target.files[0]);
@@ -122,8 +126,18 @@ const CVUpload = {
     this.extractedText = null;
 
     try {
-      if (!file.name.toLowerCase().endsWith(".pdf") && !file.name.toLowerCase().endsWith(".docx")) {
+      const isPdf = file.name.toLowerCase().endsWith(".pdf") || file.type === "application/pdf";
+      const isDocx = file.name.toLowerCase().endsWith(".docx") || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      if (!isPdf && !isDocx) {
         throw new Error("Format non pris en charge. Veuillez sélectionner un fichier PDF ou DOCX.");
+      }
+
+      const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+      if (file.size > MAX_SIZE) {
+        throw new Error("Fichier trop volumineux. La taille maximale est de 5 Mo.");
+      }
+      if (file.size === 0) {
+        throw new Error("Le fichier est vide.");
       }
 
       document.getElementById("upload-zone").style.display = "none";
@@ -157,6 +171,9 @@ const CVUpload = {
 
       if (!text || text.trim().length < 50) {
         throw new Error("Nous n'avons pas pu extraire suffisamment d'informations de votre CV.");
+      }
+      if (text.length > 50000) {
+        throw new Error("Le contenu du document est trop long. Veuillez utiliser un CV plus court (max 50000 caractères).");
       }
       this.extractedText = text;
 

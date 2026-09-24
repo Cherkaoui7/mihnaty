@@ -23,6 +23,10 @@ window.CohereAdapter = {
     const providerDef = ProviderRegistry.get(config.provider);
     let model = config.model || (providerDef ? providerDef.defaultModel : "command-r");
     let endpoint = config.endpoint || (providerDef ? providerDef.defaultEndpoint : "https://api.cohere.ai/v1/chat");
+    
+    if (endpoint && !endpoint.startsWith('https://') && !endpoint.startsWith('http://localhost') && !endpoint.startsWith('http://127.0.0.1')) {
+        throw new Error("L'endpoint doit commencer par https:// (ou http://localhost pour le développement).");
+    }
 
     const body = {
       model: model,

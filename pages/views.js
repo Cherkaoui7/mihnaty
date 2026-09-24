@@ -544,17 +544,17 @@ const Views = {
                     </div>
                     
                     <div class="form-group" id="adv-endpoint-group" style="display:none;">
-                        <label class="form-label">Endpoint API</label>
+                        <label for="adv-endpoint" class="form-label">Endpoint API</label>
                         <input type="text" id="adv-endpoint" class="form-control" placeholder="Obligatoire pour Custom">
                     </div>
                     
                     <div class="form-group" id="adv-model-group">
-                        <label class="form-label">Modèle</label>
+                        <label for="adv-model" class="form-label">Modèle</label>
                         <input type="text" id="adv-model" class="form-control" placeholder="modèle par défaut ▼">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Clé API</label>
+                        <label for="adv-key" class="form-label">Clé API</label>
                         <input type="password" id="adv-key" class="form-control" required>
                     </div>
                     
@@ -1150,8 +1150,8 @@ skills: `
         </div>
         
         <div style="margin-bottom: 1rem;">
-            <label style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Catégorie <span style="color: var(--red);">*</span></label>
-            <select id="modal-skill-category" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.95rem; outline: none; background: white;">
+            <label for="modal-skill-category" style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Catégorie <span style="color: var(--red);">*</span></label>
+                        <select id="modal-skill-category" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.95rem; outline: none; background: white;">
                 <option value="technical">Technique</option>
                 <option value="soft">Transversale</option>
                 <option value="language">Langue</option>
@@ -1159,7 +1159,7 @@ skills: `
         </div>
         
         <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Niveau : <span id="modal-skill-level-display" style="color: var(--blue); font-weight: 600;">50% (Intermédiaire)</span></label>
+            <label for="modal-skill-level" style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Niveau : <span id="modal-skill-level-display" style="color: var(--blue); font-weight: 600;">50% (Intermédiaire)</span></label>
             <input type="range" id="modal-skill-level" min="0" max="100" step="5" value="50" style="width: 100%; accent-color: var(--blue);">
             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
                 <span>0%</span>
@@ -1258,7 +1258,7 @@ skills: `
     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
         <div style="position: relative; width: 300px; max-width: 100%;">
             <svg width="18" height="18" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <input type="text" id="courses-search" placeholder="Rechercher une formation..." style="width: 100%; padding: 0.5rem 1rem 0.5rem 2.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.9rem; outline: none; background: white;">
+            <input type="text" id="courses-search" name="courses-search" placeholder="Rechercher une formation..." style="width: 100%; padding: 0.5rem 1rem 0.5rem 2.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.9rem; outline: none; background: white;">
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span style="font-size: 0.9rem; color: var(--text-dark);">Trier par :</span>
@@ -1399,8 +1399,8 @@ skills: `
 
             <!-- Compétence cible -->
             <div style="margin-bottom: 1.25rem;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Compétence cible</label>
-                <select id="filter-skill" style="width: 100%; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.9rem; outline: none; background: white;">
+                <label for="filter-skill" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Compétence cible</label>
+                        <select id="filter-skill" style="width: 100%; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.9rem; outline: none; background: white;">
                     <option value="">Toutes les compétences</option>
                 </select>
             </div>
@@ -1409,18 +1409,18 @@ skills: `
 
             <!-- Niveau -->
             <div style="margin-bottom: 1.25rem;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Niveau</label>
+                <div style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Niveau</div>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;">
-                        <input type="checkbox" class="filter-level" value="Débutant" style="accent-color: var(--blue); width: 16px; height: 16px;">
+                        <input type="checkbox" class="filter-level" name="filter-level" value="Débutant" style="accent-color: var(--blue); width: 16px; height: 16px;">
                         Débutant
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;">
-                        <input type="checkbox" class="filter-level" value="Intermédiaire" style="accent-color: var(--blue); width: 16px; height: 16px;">
+                        <input type="checkbox" class="filter-level" name="filter-level" value="Intermédiaire" style="accent-color: var(--blue); width: 16px; height: 16px;">
                         Intermédiaire
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;">
-                        <input type="checkbox" class="filter-level" value="Avancé" style="accent-color: var(--blue); width: 16px; height: 16px;">
+                        <input type="checkbox" class="filter-level" name="filter-level" value="Avancé" style="accent-color: var(--blue); width: 16px; height: 16px;">
                         Avancé
                     </label>
                 </div>
@@ -1428,22 +1428,22 @@ skills: `
 
             <!-- Type -->
             <div style="margin-bottom: 1.25rem;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Type</label>
+                <div style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Type</div>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;">
-                        <input type="checkbox" class="filter-type" value="online" style="accent-color: var(--blue); width: 16px; height: 16px;">
+                        <input type="checkbox" class="filter-type" name="filter-type" value="online" style="accent-color: var(--blue); width: 16px; height: 16px;">
                         En ligne
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;">
-                        <input type="checkbox" class="filter-type" value="offline" style="accent-color: var(--blue); width: 16px; height: 16px;">
+                        <input type="checkbox" class="filter-type" name="filter-type" value="offline" style="accent-color: var(--blue); width: 16px; height: 16px;">
                         Présentielle
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;">
-                        <input type="checkbox" class="filter-type" value="free" style="accent-color: var(--blue); width: 16px; height: 16px;">
+                        <input type="checkbox" class="filter-type" name="filter-type" value="free" style="accent-color: var(--blue); width: 16px; height: 16px;">
                         Gratuite
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;">
-                        <input type="checkbox" class="filter-type" value="cert" style="accent-color: var(--blue); width: 16px; height: 16px;">
+                        <input type="checkbox" class="filter-type" name="filter-type" value="cert" style="accent-color: var(--blue); width: 16px; height: 16px;">
                         Certifiante
                     </label>
                 </div>
@@ -1451,8 +1451,8 @@ skills: `
 
             <!-- Durée -->
             <div style="margin-bottom: 0;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Durée</label>
-                <select id="filter-duration" style="width: 100%; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.9rem; outline: none; background: white;">
+                <label for="filter-duration" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Durée</label>
+                        <select id="filter-duration" style="width: 100%; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.9rem; outline: none; background: white;">
                     <option value="">Toutes les durées</option>
                     <option value="short">< 10 heures</option>
                     <option value="medium">10-30 heures</option>
@@ -1624,7 +1624,7 @@ skills: `
             <div style="display:flex; align-items:center; gap:1rem;">
                 <div class="search-box" style="width: 300px; background: white; border: 1px solid var(--border-color);">
                     <svg width="18" height="18" fill="none" stroke="#9ca3af" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="opp-search" placeholder="Rechercher un poste, une entreprise..." style="background:transparent; border:none; outline:none; width:100%;">
+                    <input type="text" id="opp-search" name="opp-search" placeholder="Rechercher un poste, une entreprise..." style="background:transparent; border:none; outline:none; width:100%;">
                 </div>
                 <div style="display:flex; align-items:center; gap:0.5rem; background:white; padding:0.5rem 1rem; border-radius:8px; border:1px solid var(--border-color);">
                     <span style="font-size:0.9rem; color:var(--text-muted); white-space:nowrap;">Trier par :</span>
@@ -1700,8 +1700,8 @@ skills: `
                     
                     <div style="display:flex; flex-direction:column; gap:1.25rem;">
                         <div>
-                            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Secteur</label>
-                            <select id="opp-filter-sector" class="form-input" style="width:100%; padding:0.6rem; font-size:0.9rem;">
+                            <label for="opp-filter-sector" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Secteur</label>
+                        <select id="opp-filter-sector" class="form-input" style="width:100%; padding:0.6rem; font-size:0.9rem;">
                                 <option value="all">Tous les secteurs</option>
                                 <!-- Injected dynamically -->
                             </select>
@@ -1711,16 +1711,16 @@ skills: `
                             <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Type de contrat</label>
                             <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
                                 <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-                                    <input type="checkbox" class="opp-filter-contract" value="cdi"> CDI
+                                    <input type="checkbox" class="opp-filter-contract" name="opp-filter-contract" value="cdi"> CDI
                                 </label>
                                 <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-                                    <input type="checkbox" class="opp-filter-contract" value="cdd"> CDD
+                                    <input type="checkbox" class="opp-filter-contract" name="opp-filter-contract" value="cdd"> CDD
                                 </label>
                                 <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-                                    <input type="checkbox" class="opp-filter-contract" value="stage"> Stage
+                                    <input type="checkbox" class="opp-filter-contract" name="opp-filter-contract" value="stage"> Stage
                                 </label>
                                 <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-                                    <input type="checkbox" class="opp-filter-contract" value="freelance"> Freelance
+                                    <input type="checkbox" class="opp-filter-contract" name="opp-filter-contract" value="freelance"> Freelance
                                 </label>
                             </div>
                         </div>
@@ -1729,20 +1729,20 @@ skills: `
                             <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Mode de travail</label>
                             <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
                                 <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-                                    <input type="checkbox" class="opp-filter-workmode" value="onsite"> Sur site
+                                    <input type="checkbox" class="opp-filter-workmode" name="opp-filter-workmode" value="onsite"> Sur site
                                 </label>
                                 <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-                                    <input type="checkbox" class="opp-filter-workmode" value="hybrid"> Hybride
+                                    <input type="checkbox" class="opp-filter-workmode" name="opp-filter-workmode" value="hybrid"> Hybride
                                 </label>
                                 <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-                                    <input type="checkbox" class="opp-filter-workmode" value="remote"> Remote
+                                    <input type="checkbox" class="opp-filter-workmode" name="opp-filter-workmode" value="remote"> Remote
                                 </label>
                             </div>
                         </div>
 
                         <div>
-                            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Niveau d'expérience</label>
-                            <select id="opp-filter-experience" class="form-input" style="width:100%; padding:0.6rem; font-size:0.9rem;">
+                            <label for="opp-filter-experience" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Niveau d'expérience</label>
+                        <select id="opp-filter-experience" class="form-input" style="width:100%; padding:0.6rem; font-size:0.9rem;">
                                 <option value="">Tous les niveaux</option>
                                 <option value="Débutant">Débutant (0-2 ans)</option>
                                 <option value="Intermédiaire">Intermédiaire (3-5 ans)</option>
@@ -1752,8 +1752,8 @@ skills: `
                         </div>
                         
                         <div>
-                            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Localisation</label>
-                            <select id="opp-filter-location" class="form-input" style="width:100%; padding:0.6rem; font-size:0.9rem;">
+                            <label for="opp-filter-location" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem;">Localisation</label>
+                        <select id="opp-filter-location" class="form-input" style="width:100%; padding:0.6rem; font-size:0.9rem;">
                                 <option value="">Toutes les villes</option>
                                 <option value="Casablanca">Casablanca</option>
                                 <option value="Rabat">Rabat</option>
@@ -1924,16 +1924,16 @@ skills: `
                 </div>
                 <form id="job-alerts-form" onsubmit="event.preventDefault(); document.getElementById('modal-job-alerts').style.display='none'; UI.showToast('Vos alertes emploi ont été configurées', 'success');">
                     <div class="form-group">
-                        <label class="form-label">Métier / Mot-clé</label>
-                        <input type="text" class="form-input" placeholder="Ex: Développeur React, Chef de projet..." value="Développeur">
+                        <label for="alert-job" class="form-label">Métier / Mot-clé</label>
+                            <input id="alert-job" type="text" class="form-input" placeholder="Ex: Développeur React, Chef de projet..." value="Développeur">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Localisation</label>
-                        <input type="text" class="form-input" placeholder="Ex: Rabat, Remote..." value="Rabat">
+                        <label for="alert-location" class="form-label">Localisation</label>
+                            <input id="alert-location" type="text" class="form-input" placeholder="Ex: Rabat, Remote..." value="Rabat">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Type de contrat</label>
-                        <select class="form-input">
+                        <label for="alert-contract" class="form-label">Type de contrat</label>
+                            <select id="alert-contract" class="form-input">
                             <option>Tous les contrats</option>
                             <option selected>CDI</option>
                             <option>Stage</option>
@@ -1941,8 +1941,8 @@ skills: `
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Fréquence</label>
-                        <select class="form-input">
+                        <label for="alert-frequency" class="form-label">Fréquence</label>
+                            <select id="alert-frequency" class="form-input">
                             <option>Quotidienne</option>
                             <option selected>Hebdomadaire</option>
                             <option>Immédiate</option>
@@ -1961,8 +1961,8 @@ skills: `
             <h2 class="card-header">Donner votre avis</h2>
             <form id="feedback-form">
                 <div class="form-group">
-                    <label class="form-label">Ces recommandations sont-elles pertinentes ? (1 à 5)</label>
-                    <select id="feedback-rating" class="form-control">
+                    <label for="feedback-rating" class="form-label">Ces recommandations sont-elles pertinentes ? (1 à 5)</label>
+                <select id="feedback-rating" class="form-control">
                         <option value="5">★★★★★ - Excellent</option>
                         <option value="4">★★★★☆ - Très bien</option>
                         <option value="3">★★★☆☆ - Moyen</option>

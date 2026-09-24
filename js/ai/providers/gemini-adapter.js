@@ -26,6 +26,10 @@ const GeminiAdapter = {
     let model = config.model || (providerDef ? providerDef.defaultModel : "gemini-1.5-flash");
     let endpoint = config.endpoint || (providerDef ? providerDef.defaultEndpoint : `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`);
     
+    if (endpoint && !endpoint.startsWith('https://') && !endpoint.startsWith('http://localhost') && !endpoint.startsWith('http://127.0.0.1')) {
+        throw new Error("L'endpoint doit commencer par https:// (ou http://localhost pour le développement).");
+    }
+    
     if (endpoint.includes("{model}")) {
       endpoint = endpoint.replace("{model}", model);
     }

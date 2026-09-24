@@ -322,7 +322,7 @@ const App = {
                             </div>
                             <div>
                                 <h4 style="margin:0 0 0.1rem 0; font-size:0.9rem; color:var(--text-dark);">Mon CV</h4>
-                                <div style="font-size:0.75rem; color:var(--text-muted);">${analysis.cvFileName}</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted);">${Utils.escapeHTML(analysis.cvFileName)}</div>
                             </div>
                         </div>
                         <div style="display:flex; gap:0.5rem; color:var(--text-muted);">
@@ -404,6 +404,31 @@ const App = {
           const provEl = document.getElementById("ai-detected-provider");
           if (provEl) provEl.textContent = def ? def.name : config.provider;
           
+          const protoEl = document.getElementById("ai-detected-protocol");
+          if (protoEl) protoEl.textContent = def ? def.protocol : "Inconnu";
+          
+          const browserEl = document.getElementById("ai-detected-browser");
+          if (browserEl) {
+              if (def) {
+                  if (def.browserCors === true) {
+                      browserEl.innerHTML = '<span style="color:#166534;">✅ Compatible</span>';
+                  } else if (def.browserCors === false) {
+                      browserEl.innerHTML = '<span style="color:#dc2626;">❌ Non compatible (CORS)</span>';
+                  } else {
+                      browserEl.innerHTML = '<span style="color:#ca8a04;">⚠️ Inconnu</span>';
+                  }
+              } else {
+                  browserEl.textContent = "Inconnu";
+              }
+          }
+          
+          const endpointEl = document.getElementById("ai-detected-endpoint");
+          if (endpointEl) {
+              endpointEl.textContent = config.endpoint || (def ? def.defaultEndpoint : "Par défaut");
+          }
+          
+
+          
           const modelSpan = document.getElementById("ai-detected-model");
           const modelSelect = document.getElementById("ai-model-select");
           
@@ -444,10 +469,7 @@ const App = {
               };
           }
 
-          document.getElementById("ai-masked-key").textContent =
-            config.apiKey.substring(0, 4) +
-            "•".repeat(10) +
-            config.apiKey.slice(-4);
+          document.getElementById("ai-masked-key").textContent = "••••••••••••••••••••";
         } else {
           disconnectedView.style.display = "block";
           connectedView.style.display = "none";
@@ -526,7 +548,7 @@ const App = {
               document.getElementById('ai-advanced-container').style.display = 'block';
               document.getElementById('adv-key').value = key;
               document.getElementById('ai-advanced-container').scrollIntoView({ behavior: 'smooth' });
-              UI.showToast(getUserFriendlyProviderError(err), 'error');
+              UI.showToast(normalizeAIError(err).userMessage, 'error');
             } finally {
             btn.disabled = false;
             btn.textContent = originalText;
@@ -543,6 +565,7 @@ const App = {
           const endpoint = document.getElementById("adv-endpoint").value.trim();
           const model = document.getElementById("adv-model").value.trim();
           const key = document.getElementById("adv-key").value.trim();
+          
 
           if (!key) return;
 
@@ -564,7 +587,7 @@ const App = {
               throw new Error("Validation échouée.");
             }
           } catch (err) {
-            UI.showToast(getUserFriendlyProviderError(err), "error");
+            UI.showToast(normalizeAIError(err).userMessage, "error");
           } finally {
             btn.disabled = false;
             btn.textContent = originalText;
@@ -575,6 +598,20 @@ const App = {
       const changeBtn = document.getElementById("ai-change-btn");
       if (changeBtn) {
         changeBtn.onclick = () => {
+          const cfg = State.aiConfig;
+          if (cfg) {
+             document.getElementById("adv-provider").value = cfg.provider || "";
+             document.getElementById("adv-endpoint").value = cfg.endpoint || "";
+             document.getElementById("adv-model").value = cfg.model || "";
+             document.getElementById("adv-key").value = cfg.apiKey || "";
+
+             
+             if (cfg.provider === "custom") {
+                 document.getElementById("adv-endpoint-group").style.display = "block";
+             } else {
+                 document.getElementById("adv-endpoint-group").style.display = "none";
+             }
+          }
           document.getElementById("ai-advanced-container").style.display = "block";
           document.getElementById("ai-detection-error").style.display = "none";
           document.getElementById("ai-advanced-container").scrollIntoView({ behavior: 'smooth' });
@@ -611,7 +648,7 @@ const App = {
               throw new Error("Échec");
             }
           } catch (e) {
-            UI.showToast(getUserFriendlyProviderError(e), "error");
+            UI.showToast(normalizeAIError(e).userMessage, "error");
           } finally {
             btn.disabled = false;
             btn.textContent = originalText;
@@ -783,14 +820,14 @@ const App = {
                               ${!s.category ? '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : ''}
                           </div>
                           <div>
-                              <h4 style="font-size: 1rem; color: var(--navy); margin: 0; line-height: 1.2;">${s.name}</h4>
+                              <h4 style="font-size: 1rem; color: var(--navy); margin: 0; line-height: 1.2;">${Utils.escapeHTML(s.name)}</h4>
                           </div>
                       </div>
                       <div style="display: flex; gap: 0.25rem;">
-                          <button class="btn-icon btn-edit-skill" data-id="${s.id || s.name}" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:4px;" title="Modifier">
+                          <button class="btn-icon btn-edit-skill" data-id="${Utils.escapeHTML(s.id || s.name)}" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:4px;" title="Modifier">
                               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                           </button>
-                          <button class="btn-icon btn-delete-skill" data-id="${s.id || s.name}" style="background:none; border:none; color:var(--red); cursor:pointer; padding:4px;" title="Supprimer">
+                          <button class="btn-icon btn-delete-skill" data-id="${Utils.escapeHTML(s.id || s.name)}" style="background:none; border:none; color:var(--red); cursor:pointer; padding:4px;" title="Supprimer">
                               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                           </button>
                       </div>
@@ -871,10 +908,10 @@ const App = {
                       </div>
                       <div style="flex: 1;">
                           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem;">
-                              <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--navy); margin: 0;">${s.name}</h4>
+                              <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--navy); margin: 0;">${Utils.escapeHTML(s.name)}</h4>
                               <span style="font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${prioBg}; color: ${prioColor};">${prioTxt}</span>
                           </div>
-                          ${s.reason ? `<p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4;">${s.reason}</p>` : ''}
+                          ${s.reason ? `<p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4;">${Utils.escapeHTML(s.reason)}</p>` : ''}
                       </div>
                   </div>`;
               }).join('');
@@ -1286,7 +1323,7 @@ const App = {
           document.getElementById('modal-course-desc').innerText = c.description || "Aucune description complète disponible.";
           
           const tags = c.skills || (c.focus ? [c.focus] : []);
-          document.getElementById('modal-course-tags').innerHTML = tags.map(t => `<span style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: #eff6ff; color: var(--blue); border-radius: 4px; border: 1px solid #bfdbfe;">${t}</span>`).join('');
+          document.getElementById('modal-course-tags').innerHTML = tags.map(t => `<span style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: #eff6ff; color: var(--blue); border-radius: 4px; border: 1px solid #bfdbfe;">${Utils.escapeHTML(t)}</span>`).join('');
           
           document.getElementById('modal-course-price').innerText = c.isFree ? "Gratuit" : (c.price || "Sur devis");
           document.getElementById('modal-course-date').innerText = c.retrievedAt ? `Données du ${c.retrievedAt}` : "";
@@ -1388,11 +1425,11 @@ const App = {
                   if (profile.skillsToDevelop && profile.skillsToDevelop.length > 0) {
                       reason = "Correspond à votre compétence à développer";
                   }
-                  return `<div class="card" style="padding:1rem; display:flex; gap:1rem; cursor:pointer; background:#f8fafc; box-shadow:none; border:1px solid var(--border-color);" onclick="document.querySelector('.btn-view-course[data-id=\'${c.id||c.title}\']').click()">
-                      <div style="width:40px; height:40px; border-radius:6px; background:var(--navy); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; flex-shrink:0;">${(c.provider||c.title).charAt(0).toUpperCase()}</div>
+                  return `<div class="card" style="padding:1rem; display:flex; gap:1rem; cursor:pointer; background:#f8fafc; box-shadow:none; border:1px solid var(--border-color);" onclick="document.querySelector('.btn-view-course[data-id=\\\'${Utils.escapeHTML((c.id||c.title).replace(/'/g, '\\\''))}\\\']').click()">
+                      <div style="width:40px; height:40px; border-radius:6px; background:var(--navy); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; flex-shrink:0;">${Utils.escapeHTML((c.provider||c.title).charAt(0).toUpperCase())}</div>
                       <div>
-                          <h4 style="font-size:0.95rem; color:var(--navy); margin:0 0 0.2rem 0;">${c.title}</h4>
-                          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.25rem;">${c.provider || 'Source inconnue'}</div>
+                          <h4 style="font-size:0.95rem; color:var(--navy); margin:0 0 0.2rem 0;">${Utils.escapeHTML(c.title)}</h4>
+                          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.25rem;">${Utils.escapeHTML(c.provider || 'Source inconnue')}</div>
                           <span style="font-size:0.7rem; padding:0.1rem 0.4rem; background:#e0f2fe; color:var(--blue); border-radius:4px;">${reason}</span>
                       </div>
                   </div>`;
@@ -1438,7 +1475,7 @@ const App = {
                           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
                       </div>
                       <div>
-                          <h4 style="font-size:0.9rem; color:var(--navy); margin:0;">${cat[0]}</h4>
+                          <h4 style="font-size:0.9rem; color:var(--navy); margin:0;">${Utils.escapeHTML(cat[0])}</h4>
                           <div style="font-size:0.75rem; color:var(--text-muted);">${cat[1]} formation${cat[1]>1?'s':''}</div>
                       </div>
                   </div>
@@ -1742,8 +1779,8 @@ const App = {
           
           document.getElementById('modal-job-skills').innerHTML = skills.map(s => {
               const hasIt = userSkills.some(u => u.includes(s.toLowerCase()) || s.toLowerCase().includes(u));
-              if(hasIt) return `<span class="tag" style="background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;">✓ ${s}</span>`;
-              return `<span class="tag" style="background:#f1f5f9; color:var(--text-dark); border:1px solid var(--border-color);">${s}</span>`;
+              if(hasIt) return `<span class="tag" style="background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;">✓ ${Utils.escapeHTML(s)}</span>`;
+              return `<span class="tag" style="background:#f1f5f9; color:var(--text-dark); border:1px solid var(--border-color);">${Utils.escapeHTML(s)}</span>`;
           }).join('');
           
           const score = j.matchScore || j.relevanceScore || 0;
@@ -1884,7 +1921,7 @@ const App = {
                       <div style="width:48px; height:48px; border-radius:12px; background:${bgColor}; color:white; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:bold;">
                           ${initial}
                       </div>
-                      <div style="font-size:0.75rem; color:var(--text-dark); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${comp[0]}</div>
+                      <div style="font-size:0.75rem; color:var(--text-dark); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${Utils.escapeHTML(comp[0])}</div>
                   </div>
                   `;
               }).join('');
@@ -1971,7 +2008,96 @@ const App = {
               document.getElementById('roadmap-obj-contract').innerText = "CDI / Remote"; // Simulated default
               document.getElementById('roadmap-obj-location').innerText = "Rabat, Casablanca ou Remote"; // Simulated default
               
-              // Generate Steps
+              // Generate Sector-Specific Steps
+              const mappedSector = (p.primaryDomain || p.domain || "it").toLowerCase();
+              const sectorId = (typeof normalizeSector === "function") ? normalizeSector(mappedSector) : "it";
+              
+              const sectorActions = {
+                  "it": {
+                      step1: [
+                          { title: "Mettre à jour mon CV (Technologies & Frameworks)", status: "done", priority: "Moyenne", link: "upload" },
+                          { title: "Réviser les algorithmes et l'architecture", status: "done", priority: "Basse", link: "skills" },
+                          { title: "Valider 3 compétences techniques clés", status: "pending", priority: "Haute", link: "skills" }
+                      ],
+                      step4: [
+                          { title: "Réaliser un projet personnel (GitHub)", status: "pending", priority: "Haute", link: "profile" },
+                          { title: "Contribuer à un projet Open Source", status: "pending", priority: "Basse", link: "profile" },
+                          { title: "Mettre en ligne mon portfolio ou démo", status: "pending", priority: "Moyenne", link: "profile" }
+                      ],
+                      step5: [
+                          { title: "Configurer des alertes emploi (Tech/IT)", status: "pending", priority: "Moyenne", link: "opportunities" },
+                          { title: "Postuler à 3 offres pertinentes", status: "pending", priority: "Haute", link: "opportunities" }
+                      ]
+                  },
+                  "engineering-industry": {
+                      step1: [
+                          { title: "Mettre à jour mon CV avec mes habilitations", status: "done", priority: "Moyenne", link: "upload" },
+                          { title: "Réviser les normes de qualité (ISO, 5S, etc.)", status: "done", priority: "Basse", link: "skills" },
+                          { title: "Valider 3 outils CAO ou compétences clés", status: "pending", priority: "Haute", link: "skills" }
+                      ],
+                      step4: [
+                          { title: "Participer à un projet d'amélioration continue", status: "pending", priority: "Haute", link: "profile" },
+                          { title: "Visiter un site industriel ou salon pro", status: "pending", priority: "Basse", link: "profile" },
+                          { title: "Préparer un dossier technique détaillé", status: "pending", priority: "Moyenne", link: "profile" }
+                      ],
+                      step5: [
+                          { title: "Configurer des alertes emploi (Industrie)", status: "pending", priority: "Moyenne", link: "opportunities" },
+                          { title: "Postuler à 3 offres en bureau d'études ou production", status: "pending", priority: "Haute", link: "opportunities" }
+                      ]
+                  },
+                  "business": {
+                      step1: [
+                          { title: "Mettre à jour mon CV (KPIs et Résultats)", status: "done", priority: "Moyenne", link: "upload" },
+                          { title: "Réviser les techniques de négociation/vente", status: "done", priority: "Basse", link: "skills" },
+                          { title: "Valider 3 compétences commerciales/marketing", status: "pending", priority: "Haute", link: "skills" }
+                      ],
+                      step4: [
+                          { title: "Créer une étude de marché ou business case", status: "pending", priority: "Haute", link: "profile" },
+                          { title: "Développer mon réseau sur LinkedIn", status: "pending", priority: "Basse", link: "profile" },
+                          { title: "Ajouter des recommandations clients/managers", status: "pending", priority: "Moyenne", link: "profile" }
+                      ],
+                      step5: [
+                          { title: "Configurer des alertes emploi (Business/Sales)", status: "pending", priority: "Moyenne", link: "opportunities" },
+                          { title: "Contacter 3 recruteurs ou directeurs commerciaux", status: "pending", priority: "Haute", link: "opportunities" }
+                      ]
+                  },
+                  "finance": {
+                      step1: [
+                          { title: "Mettre à jour mon CV (Outils ERP, Modélisation)", status: "done", priority: "Moyenne", link: "upload" },
+                          { title: "Réviser la réglementation financière", status: "done", priority: "Basse", link: "skills" },
+                          { title: "Valider 3 compétences en comptabilité/audit", status: "pending", priority: "Haute", link: "skills" }
+                      ],
+                      step4: [
+                          { title: "Créer un modèle financier sur Excel", status: "pending", priority: "Haute", link: "profile" },
+                          { title: "S'inscrire à une association de finance", status: "pending", priority: "Basse", link: "profile" },
+                          { title: "Préparer un cas de contrôle de gestion", status: "pending", priority: "Moyenne", link: "profile" }
+                      ],
+                      step5: [
+                          { title: "Configurer des alertes emploi (Finance/Audit)", status: "pending", priority: "Moyenne", link: "opportunities" },
+                          { title: "Postuler à 3 offres en cabinet ou entreprise", status: "pending", priority: "Haute", link: "opportunities" }
+                      ]
+                  },
+                  "logistics": {
+                      step1: [
+                          { title: "Mettre à jour mon CV (Flux, ERP, Transport)", status: "done", priority: "Moyenne", link: "upload" },
+                          { title: "Réviser les incoterms et normes logistiques", status: "done", priority: "Basse", link: "skills" },
+                          { title: "Valider 3 compétences en Supply Chain", status: "pending", priority: "Haute", link: "skills" }
+                      ],
+                      step4: [
+                          { title: "Optimiser un flux logistique (Etude de cas)", status: "pending", priority: "Haute", link: "profile" },
+                          { title: "Visiter une plateforme logistique locale", status: "pending", priority: "Basse", link: "profile" },
+                          { title: "Documenter une réduction de coûts/délais", status: "pending", priority: "Moyenne", link: "profile" }
+                      ],
+                      step5: [
+                          { title: "Configurer des alertes emploi (Supply Chain)", status: "pending", priority: "Moyenne", link: "opportunities" },
+                          { title: "Postuler à 3 offres chez des prestataires ou industriels", status: "pending", priority: "Haute", link: "opportunities" }
+                      ]
+                  }
+              };
+
+              // Fallback to "it" if sectorId is null or not in the dictionary
+              const specificActions = sectorActions[sectorId] || sectorActions["it"];
+
               const steps = [
                   {
                       id: 1,
@@ -1980,11 +2106,7 @@ const App = {
                       icon: `<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`,
                       duration: "1 - 2 mois",
                       progress: 75,
-                      actions: [
-                          { title: "Mettre à jour mon CV avec les compétences acquises", status: "done", priority: "Moyenne", link: "upload" },
-                          { title: "Réviser les fondamentaux de mon secteur", status: "done", priority: "Basse", link: "skills" },
-                          { title: "Valider 3 compétences clés sur mon profil", status: "pending", priority: "Haute", link: "skills" }
-                      ]
+                      actions: specificActions.step1
                   },
                   {
                       id: 2,
@@ -1999,7 +2121,7 @@ const App = {
                           priority: "Haute",
                           link: "skills"
                       })).concat([
-                          { title: "Participer à un atelier technique", status: "pending", priority: "Moyenne", link: "courses" }
+                          { title: "Participer à un atelier technique ou métier", status: "pending", priority: "Moyenne", link: "courses" }
                       ])
                   },
                   {
@@ -2025,11 +2147,7 @@ const App = {
                       icon: `<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>`,
                       duration: "6 - 12 mois",
                       progress: 0,
-                      actions: [
-                          { title: "Réaliser un projet personnel pertinent", status: "pending", priority: "Haute", link: "profile" },
-                          { title: "Contribuer à un projet Open Source ou Associatif", status: "pending", priority: "Basse", link: "profile" },
-                          { title: "Ajouter ces réalisations à mon portfolio", status: "pending", priority: "Moyenne", link: "profile" }
-                      ]
+                      actions: specificActions.step4
                   },
                   {
                       id: 5,
@@ -2038,10 +2156,7 @@ const App = {
                       icon: `<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>`,
                       duration: "Continu",
                       progress: 0,
-                      actions: [
-                          { title: "Configurer des alertes emploi", status: "pending", priority: "Moyenne", link: "opportunities" },
-                          { title: "Postuler à 3 offres pertinentes", status: "pending", priority: "Haute", link: "opportunities" }
-                      ]
+                      actions: specificActions.step5
                   }
               ];
               
@@ -2119,10 +2234,10 @@ const App = {
                                                 ? `<svg width="20" height="20" fill="#16a34a" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>`
                                                 : `<div style="width:20px; height:20px; border-radius:50%; border:2px solid #cbd5e1;"></div>`
                                               }
-                                              <span style="font-size:0.95rem; font-weight:500; color:${isDone ? '#64748b' : 'var(--navy)'}; text-decoration:${isDone ? 'line-through' : 'none'};">${a.title}</span>
+                                              <span style="font-size:0.95rem; font-weight:500; color:${isDone ? '#64748b' : 'var(--navy)'}; text-decoration:${isDone ? 'line-through' : 'none'};">${Utils.escapeHTML(a.title)}</span>
                                           </div>
                                           <div style="display:flex; align-items:center; gap:1rem;">
-                                              <span style="font-size:0.75rem; padding:0.15rem 0.5rem; border-radius:4px; color:${pColor}; background:${pBg}; font-weight:600;">${a.priority}</span>
+                                              <span style="font-size:0.75rem; padding:0.15rem 0.5rem; border-radius:4px; color:${pColor}; background:${pBg}; font-weight:600;">${Utils.escapeHTML(a.priority)}</span>
                                               <button class="btn btn-icon" style="color:var(--blue); padding:0;" onclick="App.navigate('${a.link}')">
                                                   ${isDone ? 'Voir' : 'Commencer'} &rarr;
                                               </button>
@@ -2159,9 +2274,9 @@ const App = {
                       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:${idx===3 ? 'none' : '1px solid var(--border-color)'}; padding-bottom:${idx===3 ? '0' : '0.75rem'};">
                           <div style="display:flex; align-items:center; gap:0.5rem;">
                               <div style="width:24px; height:24px; border-radius:50%; background:var(--blue); color:white; font-size:0.75rem; font-weight:bold; display:flex; align-items:center; justify-content:center;">${idx+1}</div>
-                              <span style="font-size:0.9rem; color:var(--navy); font-weight:500;">${a.title}</span>
+                              <span style="font-size:0.9rem; color:var(--navy); font-weight:500;">${Utils.escapeHTML(a.title)}</span>
                           </div>
-                          <span style="font-size:0.75rem; color:${pColor}; background:${pBg}; padding:0.15rem 0.5rem; border-radius:4px; font-weight:600;">${a.priority}</span>
+                          <span style="font-size:0.75rem; color:${pColor}; background:${pBg}; padding:0.15rem 0.5rem; border-radius:4px; font-weight:600;">${Utils.escapeHTML(a.priority)}</span>
                       </div>`;
                   }).join('');
               } else {
@@ -2177,8 +2292,8 @@ const App = {
                       <div style="display:flex; gap:1rem; align-items:center; cursor:pointer;" onclick="App.navigate('courses')">
                           <div style="width:40px; height:40px; border-radius:8px; background:var(--navy); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; flex-shrink:0;">${initial}</div>
                           <div>
-                              <div style="font-size:0.9rem; font-weight:600; color:var(--navy); line-height:1.2; margin-bottom:0.25rem;">${c.title}</div>
-                              <div style="font-size:0.8rem; color:var(--text-muted);">${c.provider || c.category} • ${c.level || 'Tous'}</div>
+                              <div style="font-size:0.9rem; font-weight:600; color:var(--navy); line-height:1.2; margin-bottom:0.25rem;">${Utils.escapeHTML(c.title)}</div>
+                              <div style="font-size:0.8rem; color:var(--text-muted);">${Utils.escapeHTML(c.provider || c.category || "")} • ${Utils.escapeHTML(c.level || 'Tous')}</div>
                           </div>
                       </div>`;
                   }).join('');
@@ -2198,8 +2313,8 @@ const App = {
                       <div style="display:flex; gap:1rem; align-items:center; cursor:pointer;" onclick="App.navigate('opportunities')">
                           <div style="width:40px; height:40px; border-radius:8px; background:${bgColor}; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; flex-shrink:0;">${initial}</div>
                           <div style="flex:1; min-width:0;">
-                              <div style="font-size:0.9rem; font-weight:600; color:var(--navy); line-height:1.2; margin-bottom:0.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${j.title}</div>
-                              <div style="font-size:0.8rem; color:var(--text-muted);">${company} • ${j.location || j.city || 'Remote'}</div>
+                              <div style="font-size:0.9rem; font-weight:600; color:var(--navy); line-height:1.2; margin-bottom:0.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${Utils.escapeHTML(j.title)}</div>
+                              <div style="font-size:0.8rem; color:var(--text-muted);">${Utils.escapeHTML(company)} • ${Utils.escapeHTML(j.location || j.city || 'Remote')}</div>
                           </div>
                       </div>`;
                   }).join('');
@@ -2261,6 +2376,18 @@ const App = {
   },
 
   init() {
+    // Network connection status
+    window.addEventListener('offline', () => {
+      if (typeof UI !== 'undefined' && UI.showToast) {
+        UI.showToast("Connexion internet perdue. L'application fonctionne en mode hors ligne.", "error");
+      }
+    });
+    window.addEventListener('online', () => {
+      if (typeof UI !== 'undefined' && UI.showToast) {
+        UI.showToast("Connexion internet rétablie.", "success");
+      }
+    });
+
     Router.init();
     UI.updateGreeting();
   },

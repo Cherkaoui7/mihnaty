@@ -1,30 +1,63 @@
-function getUserFriendlyProviderError(error) {
-  if (error.name !== 'ProviderConnectionError') {
-    if (error.message && error.message.includes("Failed to fetch")) {
-      return "Impossible de contacter le service IA. Vérifiez votre connexion.";
-    }
-    return "Une erreur est survenue lors de la connexion au fournisseur IA.";
-  }
+window.normalizeAIError = function(error, context = {}) {
+  const provider = error.provider || context.provider || "Inconnu";
+  const endpoint = error.endpoint || context.endpoint || "";
   
-  if (error.httpStatus === 401) return "Clé API invalide."; if (error.httpStatus === 402) return "Crédit / paiement requis."; if (error.httpStatus === 404) return "Endpoint ou modèle introuvable."; if (error.httpStatus === 503) return "Service indisponible."; if (error.httpStatus === 429) { if (error.provider === "bazaarlink") { return "Le quota gratuit de BazaarLink a été atteint." + (error.freeOnly !== false ? " [ Réessayer plus tard ] ou [ Changer de fournisseur ]" : ""); } return "La limite d'utilisation a été atteinte."; } if (error.httpStatus === 0) {
-    return "Impossible de contacter le service IA. Vérifiez votre connexion.";
+  let code = "UNKNOWN";
+  let userMessage = "Une erreur est survenue lors de la connexion au fournisseur IA.";
+  let technicalMessage = error.message || "Unknown error";
+  let retryable = false;
+
+  if (error.name === 'ProviderConnectionError' || error.name === 'TypeError') {
+    // If it's a TypeError from fetch, or we explicitly caught a network issue
+    if (error.message && (error.message.includes("Failed to fetch") || error.message.includes("NetworkError") || error.message.includes("CORS"))) {
+      code = "CORS_OR_NETWORK_ERROR";
+      userMessage = "Ce fournisseur ne permet pas actuellement les appels directs depuis le navigateur ou est inaccessible.";
+      retryable = false;
+    } else if (error.httpStatus) {
+      if (error.httpStatus === 401 || error.httpStatus === 403) {
+        code = "AUTH_ERROR";
+        userMessage = "La clé API semble invalide ou les permissions sont insuffisantes.";
+        retryable = false;
+      } else if (error.httpStatus === 404) {
+        code = "INVALID_ENDPOINT_OR_MODEL";
+        userMessage = "L'endpoint API est incorrect ou le modèle n'est pas disponible.";
+        retryable = false;
+      } else if (error.httpStatus === 429) {
+        code = "RATE_LIMITED";
+        userMessage = "La limite de requêtes a été atteinte. Veuillez patienter.";
+        retryable = true;
+      } else if (error.httpStatus === 402) {
+        code = "QUOTA_EXCEEDED";
+        userMessage = "Le quota de ce fournisseur est actuellement dépassé ou un paiement est requis.";
+        retryable = false;
+      } else if (error.httpStatus >= 500) {
+        code = "SERVER_ERROR";
+        userMessage = "Le fournisseur IA rencontre actuellement des problèmes techniques.";
+        retryable = true;
+      }
+    }
   }
 
-  // Si on a une raison HTTP, on la renvoie pour que l'utilisateur comprenne l'erreur exacte
+  // Si on a une raison HTTP, on l'ajoute au message technique
   if (error.reason) {
-    return `Erreur ${error.httpStatus} : ${error.reason.substring(0, 150)}`;
+    technicalMessage += ` | Reason: ${error.reason.substring(0, 200)}`;
   }
-  
-  return error.message || "Une erreur est survenue lors de la connexion au fournisseur IA.";
+
+  return {
+    code,
+    userMessage,
+    technicalMessage,
+    retryable,
+    provider,
+    endpoint
+  };
 }
 
 const ProviderDetector = {
   async detect(apiKey) {
     if (!apiKey) throw new Error("Clé API vide.");
 
-    // Temporary logs per user request (no full API key)
-    console.log(`[ProviderDetector] key length: ${apiKey.length}`);
-    console.log(`[ProviderDetector] first segment: ${apiKey.substring(0, 4)}...`);
+
 
     // Heuristic detection based on prefix
     let candidateProvider = null;

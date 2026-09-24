@@ -1,5 +1,14 @@
-const Components = {
+const Utils = {
+  escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>"']/g, function(match) {
+      const escape = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+      return escape[match];
+    });
+  }
+};
 
+const Components = {
   renderSectorSelector(activeSectorId) {
     // Determine which sector is active based on normalization
     const active = activeSectorId ? (window.SectorsHelper ? window.SectorsHelper.normalizeSector(activeSectorId) : activeSectorId) : "it";
@@ -28,7 +37,7 @@ const Components = {
         <div class="skill-card-detailed">
            <div class="skill-header">
                <img src="${iconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%231D4ED8%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/></svg>'" class="skill-icon" alt="icon" />
-               <span class="skill-name">${skill.name}</span>
+               <span class="skill-name">${Utils.escapeHTML(skill.name)}</span>
                <span class="skill-percent">${level}%</span>
            </div>
            <div class="skill-progress-bar"><div class="fill" style="width: ${level}%"></div></div>
@@ -47,7 +56,7 @@ const Components = {
         <div class="gap-card-detailed">
             <div class="gap-header">
                 <img src="${iconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23475569%22 stroke-width=%222%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>'" class="gap-icon" alt="icon" />
-                <span class="gap-name">${skill.name}</span>
+                <span class="gap-name">${Utils.escapeHTML(skill.name)}</span>
                 <span class="gap-priority ${pClass}">${skill.priority}</span>
             </div>
             <div class="gap-progress">
@@ -96,20 +105,20 @@ const Components = {
     return `
             <div class="card" style="box-shadow:none; background:var(--bg-color);">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                    <h4 style="color:var(--primary-color);">${course.title} ${sourceBadge}</h4>
+                    <h4 style="color:var(--primary-color);">${Utils.escapeHTML(course.title)} ${sourceBadge}</h4>
                     <strong style="color:var(--purple);">${score > 0 ? score + "% pertinent" : ""}</strong>
                 </div>
                 
                 <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-                    <span>Fournisseur: ${course.provider || course.category || course.focus}</span> • 
-                    <span>Niveau: ${course.level || "Tous"}</span>
+                    <span>Fournisseur: ${Utils.escapeHTML(course.provider || course.category || course.focus || "")}</span> • 
+                    <span>Niveau: ${Utils.escapeHTML(course.level || "Tous")}</span>
                     ${isLive && course.sourceDomain ? `<br>Source: <a href="${course.url}" target="_blank" style="text-decoration:underline;">${course.sourceDomain}</a>` : ""}
                     ${course.retrievedAt ? `(Vérifié le ${course.retrievedAt})` : ""}
                 </div>
                 <div>
                     ${(course.skills || [course.focus])
                       .filter(Boolean)
-                      .map((s) => `<span class="tag">${s}</span>`)
+                      .map((s) => `<span class="tag">${Utils.escapeHTML(s)}</span>`)
                       .join("")}
                 </div>
                 
@@ -178,15 +187,15 @@ const Components = {
     return `
             <div class="card" style="box-shadow:none; border-left: 4px solid ${scoreColor};">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                    <h4>${job.title} ${sourceBadge}</h4>
+                    <h4>${Utils.escapeHTML(job.title)} ${sourceBadge}</h4>
                     <div style="text-align:right;">
                         <strong style="color:${scoreColor};">${score}% compatible</strong>
                         <div style="font-size:0.75rem; color:var(--text-muted);">Score basé sur les critères disponibles</div>
                     </div>
                 </div>
                 <div style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">
-                    ${job.company || "Entreprise non précisée"} • ${job.location || job.city || "Remote"} • ${job.type || "CDI"}
-                    ${isLive && job.sourceDomain ? `<br>Source: <a href="${job.url}" target="_blank" style="text-decoration:underline;">${job.sourceDomain}</a>` : ""}
+                    ${Utils.escapeHTML(job.company || "Entreprise non précisée")} • ${Utils.escapeHTML(job.location || job.city || "Remote")} • ${Utils.escapeHTML(job.type || "CDI")}
+                    ${isLive && job.sourceDomain ? `<br>Source: <a href="${job.url}" target="_blank" style="text-decoration:underline;">${Utils.escapeHTML(job.sourceDomain)}</a>` : ""}
                     ${job.publishedDate ? ` (Publié le: ${job.publishedDate})` : ""}
                 </div>
                 
@@ -194,14 +203,14 @@ const Components = {
                     <div>
                         <strong style="font-size:0.85rem; color:var(--green);">✓ Acquis</strong>
                         <div style="margin-top:0.5rem;">
-                            ${matching.map((s) => `<span class="tag" style="background:var(--green-light); color:var(--green);">${s}</span>`).join("")}
+                            ${matching.map((s) => `<span class="tag" style="background:var(--green-light); color:var(--green);">${Utils.escapeHTML(s)}</span>`).join("")}
                             ${matching.length === 0 ? '<em style="font-size:0.8rem;color:var(--text-muted)">Aucun</em>' : ""}
                         </div>
                     </div>
                     <div>
                         <strong style="font-size:0.85rem; color:var(--red);">⚠ Manquant</strong>
                         <div style="margin-top:0.5rem;">
-                            ${missing.map((s) => `<span class="tag" style="background:#fee2e2; color:var(--red);">${s}</span>`).join("")}
+                            ${missing.map((s) => `<span class="tag" style="background:#fee2e2; color:var(--red);">${Utils.escapeHTML(s)}</span>`).join("")}
                             ${missing.length === 0 ? '<em style="font-size:0.8rem;color:var(--text-muted)">Aucun</em>' : ""}
                         </div>
                     </div>

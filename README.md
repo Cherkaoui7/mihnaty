@@ -1,87 +1,149 @@
-# Mihnati - POC & MVP Frontend
+# Mihnati ✦ AI-Powered Career Orientation Platform
 
-Mihnati est une plateforme d'orientation professionnelle basée sur les compétences. Ce projet est un MVP 100% frontend (sans backend, sans base de données) démontrant l'architecture, l'interface et le processus de matching par IA.
+![Version](https://img.shields.io/badge/version-1.2.0--secure-blue.svg)
+![Status](https://img.shields.io/badge/status-MVP_Frontend-success.svg)
+![Architecture](https://img.shields.io/badge/architecture-Client--Side_SPA-orange.svg)
 
-## 1. Architecture du projet
+**Mihnati** est une plateforme d'orientation professionnelle et de gestion de carrière propulsée par l'Intelligence Artificielle. Ce projet est actuellement un **Proof of Concept (POC) et Minimum Viable Product (MVP) 100% frontend**. Il démontre une architecture "Serverless" locale, des interfaces fluides, et un moteur de matching avancé piloté par l'IA générative (LLMs).
 
-Le projet est conçu de manière modulaire en utilisant HTML5, CSS3, et Vanilla JavaScript (ES6+).
+---
+
+## 📑 Table des Matières
+1. [Aperçu du Projet](#-aperçu-du-projet)
+2. [Fonctionnalités Principales](#-fonctionnalités-principales)
+3. [Architecture Technique](#-architecture-technique)
+4. [Sécurité et Hardening](#-sécurité-et-hardening)
+5. [Guide de Démarrage Rapide](#-guide-de-démarrage-rapide)
+6. [Configuration de l'IA (BYOK)](#-configuration-de-lia-byok)
+7. [Structure du Dépôt](#-structure-du-dépôt)
+8. [Feuille de Route (Roadmap)](#-feuille-de-route-roadmap)
+
+---
+
+## 🚀 Aperçu du Projet
+
+Mihnati repense l'orientation professionnelle en utilisant l'IA pour extraire les compétences réelles depuis un CV et les comparer aux besoins actuels du marché. En agissant comme un conseiller carrière virtuel, Mihnati offre :
+- Une analyse fine des compétences (Hard Skills, Soft Skills, Langues).
+- Des recommandations de formations pour combler les lacunes (Skill Gaps).
+- La suggestion d'opportunités d'emploi adaptées au profil de l'utilisateur.
+
+---
+
+## ✨ Fonctionnalités Principales
+
+- **Analyse Intelligente de CV** : Traitement local de fichiers PDF et DOCX, extraction et structuration des données via un LLM.
+- **Moteur de Matching de Compétences** : Évaluation algorithmique de la compatibilité entre un candidat et une opportunité professionnelle.
+- **Génération de Feuille de Route** : Création d'un plan d'action personnalisé étape par étape pour atteindre les objectifs de carrière.
+- **Architecture BYOK (Bring Your Own Key)** : Intégration agnostique permettant à l'utilisateur de brancher le fournisseur d'IA de son choix (OpenAI, Gemini, Anthropic, Cohere, Groq, Mistral).
+- **Mode Hors Ligne / Démo** : Un mode démo riche avec des données mockées (Secteurs, Formations, Opportunités) pour évaluer l'UX sans clé API.
+
+---
+
+## 🏗 Architecture Technique
+
+L'application est construite comme une **Single Page Application (SPA)** sans framework lourd, maximisant les performances et la portabilité.
+
+- **Frontend Core** : HTML5, CSS3 (Variables natives, Flexbox/Grid), Vanilla JavaScript (ES6+).
+- **Gestion de l'État (State Management)** : Store réactif local gérant les profils, préférences et configurations IA.
+- **Routage** : Routeur côté client basé sur le hash (`#`).
+- **Parsing Local** : 
+  - `pdf.js` pour l'extraction vectorielle de texte depuis des PDF.
+  - `mammoth.js` pour le traitement des documents Word (.docx).
+- **Stockage** : `LocalStorage` (persistance du profil) et `SessionStorage` (isolation sécurisée des clés API).
+
+---
+
+## 🔒 Sécurité et Hardening (v1.2.0-secure)
+
+Suite à un audit de sécurité approfondi, le projet intègre des défenses robustes pour opérer de manière sécurisée dans un contexte 100% navigateur :
+
+- **Data Privacy & Parsing** : Les CV sont parsés localement. Le texte extrait est limité (50 000 caractères, max 5 Mo, 5 pages max) pour prévenir les attaques DoS.
+- **Prévention XSS & Injection** : 
+  - Assainissement cryptographique via `Utils.escapeHTML` sur les rendus dynamiques (`innerHTML`).
+  - Encapsulation des données non fiables dans les prompts (`--- BEGIN UNTRUSTED CV CONTENT ---`) pour contrer les Prompt Injections.
+- **Sécurité des APIs (BYOK)** :
+  - Clés stockées exclusivement dans le `sessionStorage`.
+  - Contrôle strict des endpoints (HTTPS obligatoire, aucun proxy public autorisé).
+  - Détection de pannes réseau et CORS sans fuite d'informations (Error Bleed Prevention).
+- **Protection de l'État** : Opérateurs Spread utilisés pour empêcher les attaques par *Prototype Pollution*.
+
+---
+
+## 🏁 Guide de Démarrage Rapide
+
+L'application ne nécessitant pas de backend, son exécution est immédiate.
+
+### Prérequis
+- Un navigateur web moderne (Chrome, Edge, Firefox, Safari).
+- Une connexion Internet (pour contacter les APIs des modèles d'IA et récupérer les librairies externes).
+
+### Installation et Exécution
+1. Clonez ce dépôt localement :
+   ```bash
+   git clone https://github.com/votre-organisation/mihnaty.git
+   ```
+2. Ouvrez le projet (via un serveur local pour des performances optimales, ou directement via le système de fichiers) :
+   ```bash
+   # Utilisation de Node.js via un serveur basique
+   npx serve .
+   ```
+3. Accédez à `http://localhost:3000` (ou double-cliquez sur `index.html`).
+
+---
+
+## ⚙️ Configuration de l'IA (BYOK)
+
+Mihnati vous permet d'utiliser les vrais modèles génératifs.
+
+1. Accédez à la section **Paramètres** dans la barre latérale.
+2. Sélectionnez votre **Fournisseur IA** (ex. : Google Gemini, OpenAI, Groq).
+3. (Optionnel) Modifiez l'**Endpoint** ou le **Modèle** pour utiliser des API compatibles personnalisées.
+4. Renseignez votre **Clé API** (elle ne quittera jamais votre navigateur).
+5. Sauvegardez temporairement. L'analyse de CV utilisera désormais l'intelligence artificielle en temps réel.
+
+> **Note de sécurité** : L'architecture BYOK expose inévitablement les requêtes au réseau du navigateur. Utilisez toujours des clés API avec des restrictions de budget (Hard Caps) et de domaine si votre fournisseur le permet.
+
+---
+
+## 📂 Structure du Dépôt
+
+L'arborescence est conçue pour une lisibilité maximale et une séparation claire des responsabilités :
 
 ```text
-/
-├── index.html            # Landing page
-├── app.html              # Application principale (SPA)
-├── README.md             # Ce document
-├── css/
-│   ├── variables.css     # Couleurs, espacements, ombres
-│   ├── reset.css         # Reset CSS standard
-│   ├── layout.css        # Structure de la page (Sidebar, Grid)
-│   └── components.css    # Boutons, Cards, Tags, Toasts, Loaders
+mihnaty/
+├── index.html            # Point d'entrée, dépendances CDN (pdf.js, mammoth)
+├── css/                  # Design System (variables, reset, layout, components)
 ├── pages/
-│   └── views.js          # Templates HTML des différentes vues (injectées dynamiquement)
+│   └── views.js          # Templates littéraux des vues SPA
 └── js/
-    ├── app.js            # Point d'entrée de l'application et contrôleurs des vues
-    ├── router.js         # Gestion de la navigation côté client (Hash router)
+    ├── app.js            # Initialisation, Contrôleurs de vues et UI events
+    ├── router.js         # Moteur de navigation SPA
     ├── state.js          # Gestionnaire d'état global
-    ├── storage.js        # Wrapper pour LocalStorage et SessionStorage
-    ├── mock/
-    │   └── mock-data.js  # Données simulées pour le mode démo
-    ├── ai/
-    │   ├── schema.js         # Définition du format JSON strict attendu
-    │   ├── prompt-builder.js # Construction du prompt avec le CV et le profil
-    │   ├── ai-client.js      # Client d'appel API abstrait (compatible OpenAI/Gemini)
-    │   └── ai-manager.js     # Orchestrateur (bascule entre mode réel et mode démo)
-    ├── cv/
-    │   ├── pdf-parser.js     # Extraction de texte PDF (via pdf.js)
-    │   ├── docx-parser.js    # Extraction de texte DOCX (via mammoth.js)
-    │   └── cv-upload.js      # Logique de drag&drop et timeline d'analyse
-    ├── matching/
-    │   └── skill-matching.js # Moteur local de calcul de score de compatibilité
-    └── ui/
-        ├── components.js # Fonctions de rendu HTML pour les cards et tags
-        └── toast.js      # Système de notifications
+    ├── storage.js        # Abstraction de persistance sécurisée
+    ├── ai/               # Core Intelligence Artificielle
+    │   ├── ai-manager.js         # Orchestrateur IA
+    │   ├── prompt-builder.js     # Ingénierie des Prompts
+    │   ├── response-normalizer.js# Validation et formatage JSON strict
+    │   └── providers/            # Adaptateurs pour les différents LLMs
+    ├── cv/               # Utilitaires de Parsing de documents (PDF/DOCX)
+    ├── matching/         # Moteur d'évaluation de l'adéquation candidat-emploi
+    ├── search/           # Composants liés au web grounding
+    ├── mock/             # Données mockées (Mode Démo)
+    ├── data/             # Données métier statiques (Secteurs, Formations)
+    └── ui/               # Composants interactifs (Modals, Toasts)
 ```
 
-## 2. Explication de chaque module
+---
 
-- **Core (app.js, router.js, state.js)** : Coordonne la navigation (sans rechargement de page), stocke les données en mémoire vive et fait le pont avec le stockage navigateur.
-- **AI (ai-client.js, ai-manager.js, prompt-builder.js)** : Le `ai-client` est agnostique, ce qui signifie qu'il peut prendre l'URL et la clé API de n'importe quel fournisseur compatible. Le `prompt-builder` formate le contexte et force un retour au format JSON (`schema.js`).
-- **CV (pdf-parser.js, docx-parser.js)** : Permet de lire et d'extraire le texte localement. Le CV n'est jamais uploadé sur un serveur intermédiaire, seul le texte brut est envoyé à l'IA.
-- **Matching (skill-matching.js)** : Analyse la différence entre les compétences requises par une offre et les compétences détectées chez l'utilisateur pour générer un score (ex: 82%).
+## 🗺 Feuille de Route (Roadmap)
 
-## 3. Instructions d'utilisation
+Le projet actuel vise à valider l'UX et la faisabilité algorithmique. L'évolution vers un produit commercial complet nécessitera les étapes suivantes :
 
-1. Ouvrez `index.html` dans un navigateur moderne (Chrome, Firefox, Edge, Safari).
-2. Cliquez sur **Lancer la démo** pour tester l'application sans configuration, ou **Analyser mon CV** pour commencer.
-3. Remplissez votre profil dans **Mon Profil**.
-4. Testez le flux d'analyse en déposant un faux CV (PDF ou DOCX) dans **Analyser mon CV**.
+1. **Migration Backend (Sécurisation absolue)** : Déplacer la logique `ai-client.js` vers un serveur (ex: Node.js/Python) pour agir en tant que passerelle d'IA, masquant totalement les clés maîtresses.
+2. **Base de Données et Auth** : Implémentation de PostgreSQL ou MongoDB avec Auth0/JWT pour gérer les sessions utilisateurs persistantes sur plusieurs appareils.
+3. **Data Ingestion Temps Réel** : Remplacement des données mockées par des Web Scrapers professionnels (LinkedIn, Indeed) ou agrégateurs de flux d'offres d'emploi et de formations.
+4. **Validation de Schémas IA** : Mise en place de bibliothèques robustes (ex: Zod, Pydantic) sur le backend pour garantir un parsing JSON 100% fiable en toutes circonstances.
 
-## 4. Procédure pour configurer une API AI
+---
 
-L'application peut utiliser de vraies IA génératives :
-
-1. Allez dans **Paramètres** dans la barre latérale.
-2. Choisissez votre fournisseur (ex: OpenAI, Groq, Mistral via un endpoint compatible).
-3. Entrez l'**Endpoint API** (ex: `https://api.openai.com/v1/chat/completions`).
-4. Entrez le **Nom du Modèle** (ex: `gpt-3.5-turbo`, `llama3-8b-8192`).
-5. Collez votre **Clé API**.
-6. Cliquez sur **Enregistrer temporairement**.
-7. Allez dans **Analyser mon CV** et déposez un vrai CV. Le système interrogera directement l'API configurée depuis votre navigateur.
-
-## 5. Procédure pour supprimer toutes les données
-
-- **Option A (Suppression clé IA uniquement)** : Dans Paramètres, cliquez sur `Effacer mes clés`. Cela supprime la configuration IA du SessionStorage.
-- **Option B (Hard Reset)** : Dans Paramètres, dans la "Zone de danger", cliquez sur `Réinitialiser toutes mes données`. Cela videra intégralement le `LocalStorage` et le `SessionStorage`, ramenant l'application à son état vierge.
-
-## 6. Limites de sécurité du frontend
-
-- **Clés API exposées** : La configuration IA est stockée dans le `sessionStorage` et envoyée directement depuis le client. Si une extension malveillante a accès à la page, elle pourrait lire la clé. Il faut donc toujours utiliser des clés restreintes (limite de coût, accès limité au modèle).
-- **CORS** : Certains fournisseurs API bloquent les requêtes provenant des navigateurs (CORS). Il faut privilégier les fournisseurs qui autorisent le mode Web (ex: OpenRouter, Gemini, ou en configurant correctement les headers).
-- **Absence de persistance robuste** : Effacer le cache du navigateur supprime le profil de l'utilisateur.
-
-## 7. Roadmap POC → MVP complet
-
-1. **Backend (Node.js/Python)** : Déplacer le code d'`ai-client.js` vers un serveur pour cacher les clés API des fournisseurs.
-2. **Base de données (PostgreSQL)** : Stocker les profils utilisateurs et l'historique d'analyses pour remplacer le `LocalStorage`.
-3. **Authentification (Auth0 / JWT)** : Permettre aux utilisateurs de s'inscrire, se connecter et retrouver leurs données sur plusieurs appareils.
-4. **Scraping / API Offres d'emploi** : Remplacer `mock-data.js` par de vraies APIs (LinkedIn, Indeed, etc.) pour récupérer les formations et opportunités en temps réel.
-5. **Gateway IA Avancée** : Mettre en place un système de fallback et de validation des schémas JSON côté backend pour assurer 100% de fiabilité.
+**Mihnati** — *Construire la carrière de demain, brique par brique.*
