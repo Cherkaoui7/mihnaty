@@ -9,12 +9,13 @@
 ---
 
 ## 📑 Table des Matières
+
 1. [Aperçu du Projet](#-aperçu-du-projet)
 2. [Fonctionnalités Principales](#-fonctionnalités-principales)
 3. [Architecture Technique](#-architecture-technique)
 4. [Sécurité et Hardening](#-sécurité-et-hardening)
 5. [Guide de Démarrage Rapide](#-guide-de-démarrage-rapide)
-6. [Configuration de l'IA (BYOK)](#-configuration-de-lia-byok)
+6. [Configuration de l&#39;IA (BYOK)](#-configuration-de-lia-byok)
 7. [Structure du Dépôt](#-structure-du-dépôt)
 8. [Feuille de Route (Roadmap)](#-feuille-de-route-roadmap)
 
@@ -23,6 +24,7 @@
 ## 🚀 Aperçu du Projet
 
 Mihnati repense l'orientation professionnelle en utilisant l'IA pour extraire les compétences réelles depuis un CV et les comparer aux besoins actuels du marché. En agissant comme un conseiller carrière virtuel, Mihnati offre :
+
 - Une analyse fine des compétences (Hard Skills, Soft Skills, Langues).
 - Des recommandations de formations pour combler les lacunes (Skill Gaps).
 - La suggestion d'opportunités d'emploi adaptées au profil de l'utilisateur.
@@ -46,7 +48,7 @@ L'application est construite comme une **Single Page Application (SPA)** sans fr
 - **Frontend Core** : HTML5, CSS3 (Variables natives, Flexbox/Grid), Vanilla JavaScript (ES6+).
 - **Gestion de l'État (State Management)** : Store réactif local gérant les profils, préférences et configurations IA.
 - **Routage** : Routeur côté client basé sur le hash (`#`).
-- **Parsing Local** : 
+- **Parsing Local** :
   - `pdf.js` pour l'extraction vectorielle de texte depuis des PDF.
   - `mammoth.js` pour le traitement des documents Word (.docx).
 - **Stockage** : `LocalStorage` (persistance du profil) et `SessionStorage` (isolation sécurisée des clés API).
@@ -58,7 +60,7 @@ L'application est construite comme une **Single Page Application (SPA)** sans fr
 Suite à un audit de sécurité approfondi, le projet intègre des défenses robustes pour opérer de manière sécurisée dans un contexte 100% navigateur :
 
 - **Data Privacy & Parsing** : Les CV sont parsés localement. Le texte extrait est limité (50 000 caractères, max 5 Mo, 5 pages max) pour prévenir les attaques DoS.
-- **Prévention XSS & Injection** : 
+- **Prévention XSS & Injection** :
   - Assainissement cryptographique via `Utils.escapeHTML` sur les rendus dynamiques (`innerHTML`).
   - Encapsulation des données non fiables dans les prompts (`--- BEGIN UNTRUSTED CV CONTENT ---`) pour contrer les Prompt Injections.
 - **Sécurité des APIs (BYOK)** :
@@ -74,13 +76,15 @@ Suite à un audit de sécurité approfondi, le projet intègre des défenses rob
 L'application ne nécessitant pas de backend, son exécution est immédiate.
 
 ### Prérequis
+
 - Un navigateur web moderne (Chrome, Edge, Firefox, Safari).
 - Une connexion Internet (pour contacter les APIs des modèles d'IA et récupérer les librairies externes).
 
 ### Installation et Exécution
+
 1. Clonez ce dépôt localement :
    ```bash
-   git clone https://github.com/votre-organisation/mihnaty.git
+   git clone https://github.com/Cherkaoui7/mihnaty.git
    ```
 2. Ouvrez le projet (via un serveur local pour des performances optimales, ou directement via le système de fichiers) :
    ```bash
