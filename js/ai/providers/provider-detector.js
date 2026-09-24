@@ -6,7 +6,7 @@ function getUserFriendlyProviderError(error) {
     return "Une erreur est survenue lors de la connexion au fournisseur IA.";
   }
   
-  if (error.httpStatus === 401) return "Clé API invalide."; if (error.httpStatus === 402) return "Crédit / paiement requis."; if (error.httpStatus === 404) return "Endpoint ou modèle introuvable."; if (error.httpStatus === 503) return "Service indisponible."; if (error.httpStatus === 429) { if (error.provider === "bazaarlink") { return "Le quota gratuit de BazaarLink a été atteint." + (error.freeOnly !== false ? " [ Réessayer plus tard ] ou [ Changer de fournisseur ]" : ""); } return "La limite dutilisation a été atteinte."; } if (error.httpStatus === 0) {
+  if (error.httpStatus === 401) return "ClÃ© API invalide."; if (error.httpStatus === 402) return "CrÃ©dit / paiement requis."; if (error.httpStatus === 404) return "Endpoint ou modÃ¨le introuvable."; if (error.httpStatus === 503) return "Service indisponible."; if (error.httpStatus === 429) { if (error.provider === "bazaarlink") { return "Le quota gratuit de BazaarLink a Ã©tÃ© atteint." + (error.freeOnly !== false ? " [ RÃ©essayer plus tard ] ou [ Changer de fournisseur ]" : ""); } return "La limite d'utilisation a Ã©tÃ© atteinte."; } if (error.httpStatus === 0) {
     return "Impossible de contacter le service IA. VÃ©rifiez votre connexion.";
   }
 

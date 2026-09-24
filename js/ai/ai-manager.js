@@ -66,9 +66,29 @@ const AIManager = {
     } else {
       return new Promise((resolve) => {
         setTimeout(() => {
-          const mockResult = MockData.getAnalysis(
-            State.profile ? State.profile.domain : "Informatique",
-          );
+          let sectorId = "it";
+          const text = cvText.toLowerCase();
+          
+          if (text.includes("marketing") || text.includes("commercial") || text.includes("vente") || text.includes("business")) {
+              sectorId = "business";
+          } else if (text.includes("ingénieur") || text.includes("production") || text.includes("qualité") || text.includes("industrie") || text.includes("mecanique")) {
+              sectorId = "engineering-industry";
+          } else if (text.includes("finance") || text.includes("comptabilité") || text.includes("audit")) {
+              sectorId = "finance";
+          } else if (text.includes("logistique") || text.includes("supply chain") || text.includes("transport") || text.includes("achat")) {
+              sectorId = "logistics";
+          } else if (State.profile && State.profile.domain) {
+              const normalized = typeof normalizeSector === 'function' ? normalizeSector(State.profile.domain) : null;
+              if (normalized) sectorId = normalized;
+          }
+          
+          let mockResult = null;
+          if (typeof DemoDataMulti !== 'undefined' && DemoDataMulti[sectorId]) {
+              mockResult = DemoDataMulti[sectorId];
+          } else {
+              mockResult = typeof DemoData !== 'undefined' ? DemoData : null;
+          }
+          
           State.updateAnalysis(mockResult);
           SearchCache.clearAll();
           resolve(mockResult);

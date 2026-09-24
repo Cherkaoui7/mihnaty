@@ -1,23 +1,63 @@
 const Components = {
+
+  renderSectorSelector(activeSectorId) {
+    // Determine which sector is active based on normalization
+    const active = activeSectorId ? (window.SectorsHelper ? window.SectorsHelper.normalizeSector(activeSectorId) : activeSectorId) : "it";
+    
+    let options = "";
+    if (window.Sectors) {
+        options = window.Sectors.map(s => 
+          `<option value="${s.id}" ${s.id === active ? 'selected' : ''}>${s.name}</option>`
+        ).join("");
+    }
+    
+    return `
+      <select id="dash-sector-select" style="background:transparent; color:white; border:none; font-weight:600; outline:none; cursor:pointer; font-size:1rem; border-bottom:1px dashed rgba(255,255,255,0.5); padding-bottom:2px;">
+        ${options}
+      </select>
+    `;
+  },
+
   renderSkillTag(skill) {
-    // Accept numbers or numeric strings ("85"); anything else (null, undefined) is not displayed
     const raw = Number(skill.level);
-    const level = Number.isFinite(raw) ? Math.round(raw) : null;
-    const levelHtml = level !== null ? ` (${level}%)` : "";
-    return `<span class="tag" style="background:var(--blue-light); color:var(--blue); border:1px solid var(--blue);">${skill.name}${levelHtml}</span>`;
+    const level = Number.isFinite(raw) ? Math.round(raw) : 50; // default 50
+    // Generate a simpleicon url or generic shape based on first letter
+    const iconUrl = `https://cdn.simpleicons.org/${skill.name.toLowerCase().replace(/[^a-z0-9]/g, '')}/1D4ED8`;
+    
+    return `
+        <div class="skill-card-detailed">
+           <div class="skill-header">
+               <img src="${iconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%231D4ED8%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/></svg>'" class="skill-icon" alt="icon" />
+               <span class="skill-name">${skill.name}</span>
+               <span class="skill-percent">${level}%</span>
+           </div>
+           <div class="skill-progress-bar"><div class="fill" style="width: ${level}%"></div></div>
+        </div>
+    `;
   },
 
   renderSkillToDevelop(skill) {
-    const pClass = skill.priority === "high" ? "tag-high" : "tag-medium";
+    const pClass = skill.priority === "high" ? "high" : skill.priority === "medium" ? "medium" : "low";
+    // Generate a simpleicon url or generic shape based on first letter
+    const iconUrl = `https://cdn.simpleicons.org/${skill.name.toLowerCase().replace(/[^a-z0-9]/g, '')}/1D4ED8`;
+    // For gaps, usually level is around 30-40% in demo
+    const level = Math.floor(Math.random() * 20) + 25; // Random between 25-45% for visual
+
     return `
-            <div style="padding:1rem; border:1px solid var(--border-color); border-radius:var(--radius-sm); margin-bottom:1rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                    <strong>${skill.name}</strong>
-                    <span class="tag ${pClass}">Priorité: ${skill.priority}</span>
-                </div>
-                <p style="color:var(--text-muted); font-size:0.9rem;">${skill.reason}</p>
+        <div class="gap-card-detailed">
+            <div class="gap-header">
+                <img src="${iconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23475569%22 stroke-width=%222%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>'" class="gap-icon" alt="icon" />
+                <span class="gap-name">${skill.name}</span>
+                <span class="gap-priority ${pClass}">${skill.priority}</span>
             </div>
-        `;
+            <div class="gap-progress">
+                <div class="gap-progress-bar">
+                    <div class="fill" style="width: ${level}%"></div>
+                </div>
+                <span class="gap-progress-val">${level}% ></span>
+            </div>
+        </div>
+    `;
   },
 
   renderCourseCard(course) {

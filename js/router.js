@@ -18,13 +18,13 @@ const Router = {
   handleRoute() {
     let hash = window.location.hash.substring(1);
 
-    // ── Demo mode activation / deactivation ──
-    const demoState = typeof DemoState === "undefined" ? null : DemoState;
-    if (demoState) {
-      if (hash === "demo") {
-        demoState.activate();
+    // ── Auto Demo mode activation / deactivation ──
+    const isLive = State.aiConfig && State.aiConfig.apiKey;
+    if (typeof DemoState !== "undefined") {
+      if (isLive) {
+        if (DemoState.isActive) DemoState.deactivate();
       } else {
-        demoState.deactivate();
+        if (!DemoState.isActive) DemoState.activate();
       }
     }
 
@@ -34,15 +34,9 @@ const Router = {
     // ── Resolve view ──
     if (!Views[hash]) hash = "dashboard";
 
-    // The CV analysis service is not available in the online version yet.
-    // Keep the route active, but show a clear temporary production message.
-    const isUploadTemporarilyUnavailable = hash === "upload";
-
     // Update View
     const routerView = document.getElementById("router-view");
-    routerView.innerHTML = isUploadTemporarilyUnavailable
-      ? this.renderUnderConstructionPage()
-      : Views[hash];
+    routerView.innerHTML = Views[hash];
 
     // Update active nav link
     document

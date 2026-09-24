@@ -17,7 +17,7 @@ Identify:
 - first name and last name
 - city and country
 - education level (e.g., Bac+3, Master)
-- primary domain/professional sector (e.g., Informatique, Marketing, Ressources humaines, Comptabilité / Finance, Commerce / Vente, Gestion, Logistique, Industrie, Tourisme / Hôtellerie, Design, Autre)
+- primary domain/professional sector (e.g., it, engineering-industry, business, finance, logistics)
 - target roles
 - experience years (number)
 - technical skills

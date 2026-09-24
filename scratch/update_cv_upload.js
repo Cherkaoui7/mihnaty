@@ -1,4 +1,6 @@
-const CVUpload = {
+const fs = require('fs');
+
+const jsContent = `const CVUpload = {
   extractedText: null,
   currentFile: null,
 
@@ -84,18 +86,18 @@ const CVUpload = {
     const currentIndex = steps.indexOf(step);
 
     steps.forEach((s, i) => {
-      const el = document.getElementById(`pstep-${s}`);
+      const el = document.getElementById(\`pstep-\${s}\`);
       if (!el) return;
 
       if (i < currentIndex) {
         el.style.color = "var(--green)";
-        el.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span>${el.innerText}</span>`;
+        el.innerHTML = \`<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span>\${el.innerText}</span>\`;
       } else if (i === currentIndex) {
         el.style.color = "var(--text-dark)";
-        el.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> <span>${el.innerText}</span>`;
+        el.innerHTML = \`<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> <span>\${el.innerText}</span>\`;
       } else {
         el.style.color = "var(--text-muted)";
-        el.innerHTML = `<div style="width:18px; height:18px; border:2px solid currentColor; border-radius:50%;"></div> <span>${el.innerText}</span>`;
+        el.innerHTML = \`<div style="width:18px; height:18px; border:2px solid currentColor; border-radius:50%;"></div> <span>\${el.innerText}</span>\`;
       }
     });
   },
@@ -111,9 +113,6 @@ const CVUpload = {
     if (errorZone && errorMsg) {
         errorZone.style.display = "block";
         errorMsg.innerText = msg;
-    }
-    if (window.UI && typeof UI.showToast === "function") {
-        UI.showToast(msg, "error");
     }
   },
 
@@ -219,3 +218,7 @@ const CVUpload = {
     }
   }
 };
+`;
+
+fs.writeFileSync('js/cv/cv-upload.js', jsContent, 'utf8');
+console.log("Updated js/cv/cv-upload.js successfully.");

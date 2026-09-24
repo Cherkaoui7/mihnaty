@@ -3,7 +3,7 @@ const Opportunities = [
   {
     id: "o-it-1",
     title: "Frontend Developer",
-    sector: "Informatique",
+    sector: "it",
     location: "Rabat",
     type: "CDI",
     skills: ["React", "JavaScript", "TypeScript"],
@@ -13,7 +13,7 @@ const Opportunities = [
   {
     id: "o-it-2",
     title: "Développeur Fullstack",
-    sector: "Informatique",
+    sector: "it",
     location: "Casablanca",
     type: "CDI",
     skills: ["React", "Node.js", "Docker"],
@@ -21,11 +21,11 @@ const Opportunities = [
     source: "demo",
   },
 
-  // Marketing
+  // Business
   {
-    id: "o-mk-1",
+    id: "o-bu-1",
     title: "Digital Marketing Specialist",
-    sector: "Marketing",
+    sector: "business",
     location: "Tanger",
     type: "CDI",
     skills: ["SEO", "Google Ads", "Content Marketing"],
@@ -33,12 +33,12 @@ const Opportunities = [
     source: "demo",
   },
   {
-    id: "o-mk-2",
-    title: "Assistant SEO",
-    sector: "Marketing",
+    id: "o-bu-2",
+    title: "Account Manager",
+    sector: "business",
     location: "Remote",
-    type: "Stage",
-    skills: ["SEO", "Google Analytics", "Rédaction"],
+    type: "CDI",
+    skills: ["B2B Sales", "CRM", "Negotiation"],
     level: "Junior",
     source: "demo",
   },
@@ -47,7 +47,7 @@ const Opportunities = [
   {
     id: "o-fi-1",
     title: "Junior Accountant",
-    sector: "Comptabilité / Finance",
+    sector: "finance",
     location: "Casablanca",
     type: "CDI",
     skills: ["Comptabilité", "Excel", "Fiscalité"],
@@ -57,7 +57,7 @@ const Opportunities = [
   {
     id: "o-fi-2",
     title: "Financial Analyst",
-    sector: "Comptabilité / Finance",
+    sector: "finance",
     location: "Rabat",
     type: "CDI",
     skills: ["Financial Analysis", "Excel", "Reporting"],
@@ -65,25 +65,47 @@ const Opportunities = [
     source: "demo",
   },
 
-  // HR
+  // Engineering / Industry
   {
-    id: "o-hr-1",
-    title: "Chargé de Recrutement",
-    sector: "Ressources humaines",
-    location: "Marrakech",
+    id: "o-en-1",
+    title: "Ingénieur Production",
+    sector: "engineering-industry",
+    location: "Kénitra",
     type: "CDI",
-    skills: ["Sourcing", "Entretiens", "LinkedIn Recruiter"],
+    skills: ["Lean Manufacturing", "Gestion de production", "AutoCAD"],
     level: "Junior",
     source: "demo",
   },
   {
-    id: "o-hr-2",
-    title: "HR Business Partner",
-    sector: "Ressources humaines",
+    id: "o-en-2",
+    title: "Responsable Qualité",
+    sector: "engineering-industry",
     location: "Casablanca",
     type: "CDI",
-    skills: ["Droit social", "Gestion des conflits", "Paie"],
+    skills: ["ISO 9001", "Audit", "Amélioration continue"],
     level: "Senior",
+    source: "demo",
+  },
+  
+  // Logistics
+  {
+    id: "o-lo-1",
+    title: "Supply Chain Manager",
+    sector: "logistics",
+    location: "Tanger",
+    type: "CDI",
+    skills: ["Supply Chain", "SAP", "Optimisation des flux"],
+    level: "Intermédiaire",
+    source: "demo",
+  },
+  {
+    id: "o-lo-2",
+    title: "Coordinateur Logistique",
+    sector: "logistics",
+    location: "Agadir",
+    type: "Stage",
+    skills: ["Transport", "Suivi des commandes", "Stock"],
+    level: "Junior",
     source: "demo",
   },
 ];

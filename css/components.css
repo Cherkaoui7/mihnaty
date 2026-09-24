@@ -30,6 +30,26 @@
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-color);
     margin-bottom: 1.5rem;
+    transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.header-card {
+    background: var(--hero-gradient);
+    color: var(--white);
+    border: none;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+.header-card h2, .header-card strong {
+    color: var(--white) !important;
+}
+.header-card .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
 }
 .card-header {
     font-size: 1.25rem;
@@ -171,3 +191,135 @@
 .timeline-step.done span {
     color: var(--green);
 }
+
+/* New Dashboard Skill Cards */
+.skill-card-detailed {
+    display:flex;
+    flex-direction:column;
+    background:var(--white);
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:0.75rem 1rem;
+    box-shadow:0 1px 2px rgba(0,0,0,0.05);
+}
+.skill-card-detailed .skill-header {
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    margin-bottom:0.75rem;
+}
+.skill-card-detailed .skill-icon {
+    width:24px;
+    height:24px;
+    object-fit:contain;
+}
+.skill-card-detailed .skill-name {
+    font-weight:600;
+    font-size:0.9rem;
+    flex:1;
+}
+.skill-card-detailed .skill-percent {
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--navy);
+}
+.skill-card-detailed .skill-progress-bar {
+    height:6px;
+    background:#f1f5f9;
+    border-radius:99px;
+    overflow:hidden;
+}
+.skill-card-detailed .skill-progress-bar .fill {
+    height:100%;
+    background:var(--primary-color);
+    border-radius:99px;
+}
+
+/* Gap Card Detailed */
+.gap-card-detailed {
+    display:flex;
+    flex-direction:column;
+    background:var(--white);
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:0.75rem 1rem;
+    box-shadow:0 1px 2px rgba(0,0,0,0.05);
+    margin-bottom:0.75rem;
+}
+.gap-card-detailed .gap-header {
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+}
+.gap-card-detailed .gap-icon {
+    width:24px;
+    height:24px;
+    object-fit:contain;
+}
+.gap-card-detailed .gap-name {
+    font-weight:600;
+    font-size:0.95rem;
+    flex:1;
+}
+.gap-card-detailed .gap-priority {
+    font-size:0.75rem;
+    font-weight:600;
+    padding:0.25rem 0.6rem;
+    border-radius:99px;
+}
+.gap-priority.high { background:#fee2e2; color:var(--red); }
+.gap-priority.medium { background:#f3e8ff; color:var(--purple); }
+.gap-priority.low { background:#e0f2fe; color:var(--primary-color); }
+
+.gap-card-detailed .gap-progress {
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    margin-top:0.75rem;
+}
+.gap-card-detailed .gap-progress-bar {
+    flex:1;
+    height:6px;
+    background:#f1f5f9;
+    border-radius:99px;
+    position:relative;
+}
+.gap-card-detailed .gap-progress-bar .fill {
+    height:100%;
+    background:var(--primary-color);
+    border-radius:99px;
+}
+.gap-card-detailed .gap-progress-val {
+    font-size:0.8rem;
+    font-weight:600;
+    color:var(--navy);
+}
+
+/* Dashboard Empty States */
+.empty-state {
+    text-align:center;
+    padding:2rem 1rem;
+}
+.empty-state-icon {
+    width:64px;
+    height:64px;
+    background:#eff6ff;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 1.5rem auto;
+    color:var(--primary-color);
+    position:relative;
+}
+.empty-state-icon::before, .empty-state-icon::after {
+    content:'✦';
+    position:absolute;
+    color:#bfdbfe;
+    font-size:1.2rem;
+}
+.empty-state-icon::before { top:-10px; left:-15px; }
+.empty-state-icon::after { bottom:-5px; right:-20px; font-size:1.5rem; }
+
+.empty-state h4 { margin:0 0 0.5rem 0; font-weight:600; font-size:1.1rem; }
+.empty-state p { color:var(--text-muted); font-size:0.9rem; line-height:1.5; margin:0 0 1.5rem 0; }
