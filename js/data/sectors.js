@@ -111,3 +111,7 @@ function getSectorById(id) {
   const normalized = normalizeSector(id);
   return Sectors.find(s => s.id === normalized || s.id === id) || null;
 }
+
+window.Sectors = Sectors;
+window.normalizeSector = normalizeSector;
+window.getSectorById = getSectorById;

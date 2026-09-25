@@ -11,12 +11,10 @@ const AIManager = {
     const def = ProviderRegistry.get(config.provider);
     if (!def || !def.capabilities) return false;
     
-    if (capability === 'webSearch' && config.provider === 'bazaarlink') {
-      const modelId = (config.model || "").toLowerCase();
-      if (modelId.includes("online") || modelId.includes("sonar") || modelId.includes("search") || modelId.includes("perplexity")) {
-        return true;
-      }
-      return false;
+    // Allow webSearch for all providers so users aren't blocked, 
+    // even if the model hallucinates links.
+    if (capability === 'webSearch') {
+      return true;
     }
     
     return !!def.capabilities[capability];

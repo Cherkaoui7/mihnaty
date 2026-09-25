@@ -3,13 +3,16 @@ const AI_JSON_SCHEMA = `
   "profile": {
     "firstName": "string | null",
     "lastName": "string | null",
+    "email": "string | null",
+    "phone": "string | null",
     "city": "string | null",
     "country": "string | null",
     "educationLevel": "string | null",
     "primaryDomain": "string | null",
     "secondaryDomains": ["string"],
     "targetRole": "string | null",
-    "experienceYears": "number | null"
+    "experienceYears": "number | null",
+    "about": "string | null"
   },
   "skills": [
     {

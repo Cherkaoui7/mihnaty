@@ -16,7 +16,10 @@ window.ResponseNormalizer = {
       secondaryDomains: Array.isArray(profile.secondaryDomains) ? profile.secondaryDomains : [],
       targetRole: profile.targetRole ?? null,
       experienceYears: profile.experienceYears ?? null,
-      experienceLevel: profile.experienceLevel ?? null
+      experienceLevel: profile.experienceLevel ?? null,
+      email: profile.email ?? null,
+      phone: profile.phone ?? null,
+      about: profile.about ?? null
     };
 
     return {
@@ -38,7 +41,7 @@ window.ResponseNormalizer = {
       salary: job.salary || "Non spécifié",
       description: job.description || "",
       matchReason: job.matchReason || "",
-      url: job.url || null
+      url: job.url && job.url.startsWith("http") ? job.url : (job.url ? "https://" + job.url.replace(/^\/+/, "") : null)
     }));
   },
 
@@ -50,7 +53,7 @@ window.ResponseNormalizer = {
       duration: course.duration || "Non spécifié",
       description: course.description || "",
       targetSkill: course.targetSkill || "",
-      url: course.url || null
+      url: course.url && course.url.startsWith("http") ? course.url : (course.url ? "https://" + course.url.replace(/^\/+/, "") : null)
     }));
   }
 };

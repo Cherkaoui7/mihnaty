@@ -313,6 +313,11 @@ const Views = {
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="form-group" style="margin-top:1.5rem;">
+                            <label class="form-label">À propos de vous</label>
+                            <textarea id="profile-about" class="form-control" rows="4" placeholder="Décrivez votre parcours, vos objectifs et ce qui vous motive..."></textarea>
+                        </div>
                 </div>
 
                 <!-- Profil professionnel -->
