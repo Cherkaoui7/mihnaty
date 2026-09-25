@@ -42,8 +42,10 @@ ${AI_JSON_SCHEMA}
   },
 
   buildJobSearchPrompt(profile) {
+    const currentDate = new Date().toISOString().split('T')[0];
     return `
 You are finding CURRENT PUBLIC job and internship opportunities for a candidate in Morocco.
+Today's date is: ${currentDate}.
 
 Candidate sector: ${profile.primaryDomain || profile.domain}
 Target role: ${profile.targetRole}
@@ -57,7 +59,8 @@ Prefer official and reputable sources (company career pages, reputable job platf
 
 Return ONLY verifiable opportunities that currently exist.
 CRITICAL: You MUST provide the EXACT DIRECT URL to the specific job posting (deep link to the application page, e.g., https://company.com/careers/job-1234). DO NOT provide generic company homepages (e.g., https://company.com). If you cannot find the direct link, do not include the opportunity.
-Do not invent companies, titles, URLs, dates, skills or salaries.
+CRITICAL: Only return opportunities published recently (within the last 3-6 months of ${currentDate}). DO NOT return old opportunities from previous years (like 2022 or 2023).
+Do not invent companies, titles, URLs, dates, skills or salaries. If you do not have live web search capabilities and only have old training data, return an empty array rather than hallucinating old jobs.
 
 Return a JSON array of up to 5 best matching opportunities.
 Format:
@@ -84,8 +87,10 @@ Format:
   },
 
   buildCourseSearchPrompt(profile) {
+    const currentDate = new Date().toISOString().split('T')[0];
     return `
 Find real training opportunities that help this user develop their missing skills.
+Today's date is: ${currentDate}.
 
 Sector: ${profile.primaryDomain || profile.domain}
 Target role: ${profile.targetRole}
@@ -96,7 +101,8 @@ Search the public web using Google Search grounding.
 Prefer official training providers, recognized platforms (Coursera, Udemy, local centers), and universities.
 
 Return ONLY verifiable resources with URLs.
-Do not invent price, duration, certification, organization or availability.
+CRITICAL: Only return courses relevant for ${currentDate} and beyond.
+Do not invent price, duration, certification, organization or availability. If you do not have live web search capabilities, return an empty array rather than hallucinating fake links.
 
 Return a JSON array of up to 5 best matching courses.
 Format:

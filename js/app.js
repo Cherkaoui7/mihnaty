@@ -1287,7 +1287,7 @@ const App = {
           if (filtered.length === 0) {
               showEmpty();
               document.getElementById("courses-empty-title").innerText = "Aucune formation trouvée";
-              document.getElementById("courses-empty-desc").innerText = "Essayez de modifier vos filtres ou d'élargir votre recherche.";
+              document.getElementById("courses-empty-desc").innerText = "Si vous utilisez un modèle sans accès Internet (comme GPT-4o-mini), l'IA ne peut pas voir les offres en temps réel. Essayez d'utiliser Google Gemini dans les Paramètres.";
               document.getElementById("courses-empty-actions").innerHTML = `<button class="btn btn-secondary" onclick="document.getElementById('btn-reset-filters').click()">Réinitialiser les filtres</button>`;
           } else {
               showCourses();
@@ -1735,6 +1735,8 @@ const App = {
           // Render
           if (filtered.length === 0) {
               showEmpty();
+              document.getElementById("opp-empty-title").innerText = "Aucune opportunité trouvée";
+              document.getElementById("opp-empty-desc").innerText = "Si vous utilisez un modèle sans accès Internet (comme GPT-4o-mini), l'IA ne peut pas voir les offres récentes. Essayez d'utiliser Google Gemini dans les Paramètres pour une recherche web en direct.";
           } else {
               showOpps();
               container.innerHTML = filtered.map(j => renderDetailedJobCard(j)).join("");
