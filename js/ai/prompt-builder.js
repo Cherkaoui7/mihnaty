@@ -15,16 +15,17 @@ IMPORTANT — skill levels: For each skill, always return a numeric "level" betw
 
 Identify:
 - first name and last name
+- email address and phone number
 - city and country
+- a short summary or 'about you' bio based on the CV
 - education level (e.g., Bac+3, Master)
 - primary domain/professional sector (e.g., it, engineering-industry, business, finance, logistics)
 - target roles
 - experience years (number)
-- technical skills
-- transferable skills
-- languages
-- certifications
-- skill gaps (what is missing to reach the target role)
+- technical skills (category: "technical")
+- transferable or soft skills (category: "soft")
+- languages (category: "language")
+- skill gaps (what is missing to reach the target role, must be placed in skillsToDevelop array)
 
 ${profileContext}
 
@@ -54,7 +55,8 @@ Location: Maroc (prioritize remote, Rabat, Casablanca, Tanger, etc.)
 Search the public web using Google Search grounding.
 Prefer official and reputable sources (company career pages, reputable job platforms, LinkedIn, Rekrute, etc.).
 
-Return ONLY verifiable opportunities that currently exist and provide the exact source URL.
+Return ONLY verifiable opportunities that currently exist.
+CRITICAL: You MUST provide the EXACT DIRECT URL to the specific job posting (deep link to the application page, e.g., https://company.com/careers/job-1234). DO NOT provide generic company homepages (e.g., https://company.com). If you cannot find the direct link, do not include the opportunity.
 Do not invent companies, titles, URLs, dates, skills or salaries.
 
 Return a JSON array of up to 5 best matching opportunities.

@@ -199,8 +199,14 @@ const App = {
 
         safeSet("profile-first-name", profileData.firstName || (profileData.fullName ? profileData.fullName.split(" ")[0] : ""));
         safeSet("profile-last-name", profileData.lastName || (profileData.fullName ? profileData.fullName.substring(profileData.fullName.indexOf(" ") + 1) : ""));
+        safeSet("profile-email", profileData.email);
+        safeSet("profile-phone", profileData.phone);
+        safeSet("profile-about", profileData.about);
         safeSet("profile-city", profileData.city);
         safeSet("profile-education", profileData.educationLevel);
+        
+        const heroAbout = document.getElementById("hero-about");
+        if(heroAbout) heroAbout.innerText = profileData.about || "Aucune description fournie.";
         
         let pDom = profileData.primaryDomain || profileData.domain || "";
         if (typeof window.SectorsHelper !== 'undefined' && window.SectorsHelper.normalizeSector) {
@@ -286,6 +292,17 @@ const App = {
                 });
             }
 
+            if (analysis && analysis.recommendations && Array.isArray(analysis.recommendations.nextSteps)) {
+                analysis.recommendations.nextSteps.forEach(step => {
+                    suggestions.push({
+                        title: "Suggestion IA",
+                        desc: step,
+                        icon: "M13 10V3L4 14h7v7l9-11h-7z",
+                        color: "orange"
+                    });
+                });
+            }
+
             if (suggestions.length === 0) {
                 suggestionsDiv.innerHTML = `<div style="text-align:center; padding: 1rem; color:var(--text-muted); font-size:0.9rem;">Votre profil est excellent ! Aucune suggestion pour le moment.</div>`;
             } else {
@@ -359,6 +376,9 @@ const App = {
               firstName: fName,
               lastName: lName,
               fullName: fName + " " + lName,
+              email: document.getElementById("profile-email") ? document.getElementById("profile-email").value : "",
+              phone: document.getElementById("profile-phone") ? document.getElementById("profile-phone").value : "",
+              about: document.getElementById("profile-about") ? document.getElementById("profile-about").value : "",
               city: document.getElementById("profile-city").value,
               educationLevel: document.getElementById("profile-education").value,
               primaryDomain: document.getElementById("profile-domain").value,
@@ -372,6 +392,9 @@ const App = {
               State.analysis.profile.fullName = fName + " " + lName;
               State.analysis.profile.firstName = fName;
               State.analysis.profile.lastName = lName;
+              if (document.getElementById("profile-email")) State.analysis.profile.email = document.getElementById("profile-email").value;
+              if (document.getElementById("profile-phone")) State.analysis.profile.phone = document.getElementById("profile-phone").value;
+              if (document.getElementById("profile-about")) State.analysis.profile.about = document.getElementById("profile-about").value;
               State.analysis.profile.city = document.getElementById("profile-city").value;
               State.analysis.profile.educationLevel = document.getElementById("profile-education").value;
               State.analysis.profile.experienceYears = yrs;
@@ -1056,11 +1079,8 @@ const App = {
       if (sectorSelect && typeof Sectors !== 'undefined') {
           sectorSelect.innerHTML = `<option value="all">Tous les secteurs</option>` + 
               Sectors.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
-          if (profile.profile && (profile.profile.primaryDomain || profile.profile.domain)) {
-              let pDom = profile.profile.primaryDomain || profile.profile.domain;
-              if (typeof window.SectorsHelper !== 'undefined') pDom = window.SectorsHelper.normalizeSector(pDom);
-              sectorSelect.value = pDom;
-          }
+          // Default to 'all' so we don't hide AI results aggressively
+          sectorSelect.value = 'all';
       }
       
       const skillSelect = document.getElementById("filter-skill");
@@ -1540,11 +1560,8 @@ const App = {
       if (sectorSelect && typeof Sectors !== 'undefined') {
           sectorSelect.innerHTML = `<option value="all">Tous les secteurs</option>` + 
               Sectors.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
-          if (profile.profile && (profile.profile.primaryDomain || profile.profile.domain)) {
-              let pDom = profile.profile.primaryDomain || profile.profile.domain;
-              if (typeof window.SectorsHelper !== 'undefined') pDom = window.SectorsHelper.normalizeSector(pDom);
-              sectorSelect.value = pDom;
-          }
+          // Default to 'all' so we don't hide AI results aggressively
+          sectorSelect.value = 'all';
       }
       
       // Prepare UI states
